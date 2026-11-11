@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>区域预设标注器 · 斗地主屏幕记牌</title>
+<meta name="description" content="在本地把一张牌桌截图框成归一化坐标预设。图片不上传，全部在本机浏览器内完成。">
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a21; --panel-2:#1c222b; --line:#2a323d;
+    --text:#e8ecf2; --muted:#98a4b3; --accent:#4c8dff; --ok:#4ade80; --warn:#f0b429; --danger:#ff6b6b;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --hand:#4c8dff; --count:#6ee7b7; --play:#f0b429;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);line-height:1.65;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 20px 80px}
+  a{color:#9cc3ff}
+  h1{font-size:clamp(22px,3.4vw,30px);margin:6px 0 8px;letter-spacing:-.4px}
+  .sub{color:var(--muted);font-size:14.5px;margin:0 0 22px;max-width:70ch}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+  @media(max-width:980px){.layout{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:16px}
+  .stage{position:relative;min-height:280px;display:flex;align-items:center;justify-content:center;
+    background:#0b0e13;border:1px dashed var(--line);border-radius:12px;overflow:hidden}
+  .stage.drag{border-color:var(--accent);background:#0d1420}
+  .stage canvas{display:block;max-width:100%;cursor:crosshair;touch-action:none}
+  .hint{color:var(--muted);font-size:13.5px;text-align:center;padding:26px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 0}
+  button{font:inherit;font-size:13.5px;padding:7px 12px;border-radius:9px;cursor:pointer;
+    background:rgba(255,255,255,.05);color:#dbe4ef;border:1px solid var(--line)}
+  button:hover{border-color:#3d4a5a;background:rgba(255,255,255,.08)}
+  button.on{border-color:var(--accent);color:#cfe0ff;background:rgba(76,141,255,.16)}
+  button.primary{background:linear-gradient(180deg,#5a97ff,#3a78e8);border-color:transparent;color:#fff;font-weight:600}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  label{font-size:13px;color:var(--muted);display:block;margin:12px 0 5px}
+  input[type=text]{width:100%;font:inherit;font-size:13.5px;padding:8px 10px;border-radius:8px;
+    background:#0b0e13;color:#dbe4ef;border:1px solid var(--line)}
+  textarea{width:100%;height:210px;font-family:var(--mono);font-size:11.5px;line-height:1.55;
+    background:#0b0e13;color:#a9bcd2;border:1px solid var(--line);border-radius:10px;padding:11px;resize:vertical}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:10px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+  .status{font-size:13px;margin-top:8px;min-height:20px}
+  .status.ok{color:var(--ok)} .status.warn{color:var(--warn)} .status.bad{color:var(--danger)}
+  .kbd{font-family:var(--mono);font-size:11.5px;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;color:#bcd0e6}
+  ol{margin:8px 0 0;padding-left:20px;color:#c8d2de;font-size:13.5px}
+  ol li{margin:4px 0}
+  .foot{margin-top:26px;font-size:12.5px;color:#6f7c8b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="./index.html" style="font-size:13px;text-decoration:none;border-bottom:1px dotted #3d4a5a">← 返回下载页</a>
+  <h1>区域预设标注器</h1>
+  <p class="sub">把一张牌桌截图框成三块区域，导出可直接喂给应用的预设 JSON。
+  图片只在这个页面里读，<b>不会上传到任何地方</b>（本页没有任何网络请求）。</p>
+
+  <div class="layout">
+    <div class="card">
+      <div class="stage" id="stage">
+        <div class="hint" id="hint">
+          把截图拖到这里，或
+          <button id="pick" style="margin-left:6px">选择图片</button>
+          <div style="margin-top:10px;font-size:12.5px">支持 PNG / JPG。建议用整局开始时的画面，牌点、张数、出牌区都在。</div>
+        </div>
+        <canvas id="cv" hidden></canvas>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+
+      <div class="row" id="tools" hidden>
+        <button data-region="handArea" class="on">手牌区</button>
+        <button data-region="countArea">张数区</button>
+        <button data-region="playArea">出牌区</button>
+        <span style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>
+        <button id="undo">撤销上一个</button>
+        <button id="clear">全部清除</button>
+        <button id="reload">换一张图</button>
+      </div>
+      <div class="legend" id="legend" hidden>
+        <span><i style="background:var(--hand)"></i>手牌区（你的手牌点数）</span>
+        <span><i style="background:var(--count)"></i>张数区（三家剩余张数）</span>
+        <span><i style="background:var(--play)"></i>出牌区（桌面出的牌）</span>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="card">
+      <label for="pname">预设名称</label>
+      <input type="text" id="pname" value="我的牌桌 · 默认皮肤">
+
+      <label for="pid">预设 ID（英文，随模板文件保存）</label>
+      <input type="text" id="pid" value="custom_layout_01">
+
+      <label>方向</label>
+      <div class="row" style="margin-top:0">
+        <button data-orient="landscape" class="on">横屏</button>
+        <button data-orient="portrait">竖屏</button>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="primary" id="export" disabled>生成预设 JSON</button>
+        <button id="copy" disabled>复制</button>
+        <button id="save" disabled>下载 .json</button>
+      </div>
+
+      <textarea id="out" readonly placeholder="框完三个区域后点「生成预设 JSON」"></textarea>
+
+      <div class="foot">
+        <b>怎么用</b>
+        <ol>
+          <li>选一块区域（默认手牌区），在图上拖出一个框。</li>
+          <li>依次框完三块，可随时撤销或重画。</li>
+          <li>点「生成预设 JSON」，复制或下载。</li>
+          <li>在应用里导入模板，<b>一定要跑一次「试识别」</b>再开局。</li>
+        </ol>
+        <div style="margin-top:10px">快捷键：<span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span> 切换区域，<span class="kbd">Ctrl+Z</span> 撤销，<span class="kbd">Esc</span> 取消当前框。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var REGIONS = ['handArea', 'countArea', 'playArea'];
+  var COLORS  = { handArea: '#4c8dff', countArea: '#6ee7b7', playArea: '#f0b429' };
+  var LABELS  = { handArea: '手牌区', countArea: '张数区', playArea: '出牌区' };
+
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var stage = document.getElementById('stage');
+  var statusEl = document.getElementById('status');
+  var outEl = document.getElementById('out');
+
+  var img = null;              // HTMLImageElement
+  var rects = {};              // region -> {x,y,w,h} 归一化
+  var active = 'handArea';
+  var orientation = 'landscape';
+  var drag = null;             // {x0,y0,x1,y1} in CSS px of canvas
+  var cssW = 0, cssH = 0;      // canvas 显示尺寸
+
+  /* ---------- 纯函数：像素 → 归一化（可独立测试） ---------- */
+  function clamp01(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+  function normalizeRect(px, py, qx, qy, W, H) {
+    if (!(W > 0) || !(H > 0)) return null;
+    // 先把像素坐标夹进画布，再算宽高；否则从画布外拖进来时宽度会把界外那段也算进去
+    var cx1 = Math.min(Math.max(px, 0), W), cx2 = Math.min(Math.max(qx, 0), W);
+    var cy1 = Math.min(Math.max(py, 0), H), cy2 = Math.min(Math.max(qy, 0), H);
+    var x1 = Math.min(cx1, cx2), x2 = Math.max(cx1, cx2);
+    var y1 = Math.min(cy1, cy2), y2 = Math.max(cy1, cy2);
+    var r = {
+      x: +(x1 / W).toFixed(4),
+      y: +(y1 / H).toFixed(4),
+      w: +((x2 - x1) / W).toFixed(4),
+      h: +((y2 - y1) / H).toFixed(4)
+    };
+    // 与规格一致：宽或高不超过 0.5% 视为误触，不记录
+    if (r.w <= 0.005 || r.h <= 0.005) return null;
+    if (r.x + r.w > 1) r.w = +(1 - r.x).toFixed(4);
+    if (r.y + r.h > 1) r.h = +(1 - r.y).toFixed(4);
+    return r;
+  }
+
+  function buildPreset() {
+    var missing = REGIONS.filter(function (r) { return !rects[r]; });
+    return {
+      schemaVersion: 1,
+      id: (document.getElementById('pid').value || 'custom_layout').trim(),
+      displayName: (document.getElementById('pname').value || '自定义布局').trim(),
+      game: 'ddz',
+      orientation: orientation,
+      referenceResolution: img ? { w: img.naturalWidth, h: img.naturalHeight } : null,
+      aspectTolerance: 0.06,
+      regions: {
+        handArea: rects.handArea || null,
+        countArea: rects.countArea || null,
+        playArea: rects.playArea || null
+      },
+      notes: '坐标为归一化值(0-1)，相对整屏；使用时乘以实际屏幕宽高',
+      verified: false,
+      _missing: missing
+    };
+  }
+
+  /* ---------- 渲染 ---------- */
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+  }
+
+  function fitCanvas() {
+    if (!img) return;
+    var maxW = Math.max(280, stage.clientWidth - 4);
+    var maxH = Math.max(240, Math.min(window.innerHeight * 0.62, 720));
+    var scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
+    cssW = Math.round(img.naturalWidth * scale);
+    cssH = Math.round(img.naturalHeight * scale);
+    cv.style.width = cssW + 'px';
+    cv.style.height = cssH + 'px';
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = Math.round(cssW * dpr);
+    cv.height = Math.round(cssH * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function draw() {
+    if (!img) return;
+    ctx.clearRect(0, 0, cssW, cssH);
+    ctx.drawImage(img, 0, 0, cssW, cssH);
+
+    REGIONS.forEach(function (r) {
+      var box = rects[r];
+      if (!box) return;
+      var x = box.x * cssW, y = box.y * cssH, w = box.w * cssW, h = box.h * cssH;
+      ctx.save();
+      ctx.fillStyle = hexA(COLORS[r], 0.13);
+      ctx.fillRect(x, y, w, h);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = COLORS[r];
+      ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+      ctx.fillStyle = COLORS[r];
+      ctx.font = '600 12px system-ui,-apple-system,sans-serif';
+      var tx = Math.min(Math.max(x + 4, 4), Math.max(4, cssW - 60));
+      var ty = y > 16 ? y - 6 : y + 15;
+      ctx.fillText(LABELS[r], tx, ty);
+      ctx.restore();
+    });
+
+    if (drag) {
+      var d = drag;
+      var rx = Math.min(d.x0, d.x1), ry = Math.min(d.y0, d.y1);
+      var rw = Math.abs(d.x1 - d.x0), rh = Math.abs(d.y1 - d.y0);
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = COLORS[active];
+      ctx.strokeRect(rx, ry, rw, rh);
+      ctx.restore();
+    }
+  }
+
+  function hexA(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+
+  /* ---------- 交互 ---------- */
+  function pos(e) {
+    var r = cv.getBoundingClientRect();
+    return {
+      x: Math.min(Math.max(e.clientX - r.left, 0), cssW),
+      y: Math.min(Math.max(e.clientY - r.top, 0), cssH)
+    };
+  }
+
+  cv.addEventListener('pointerdown', function (e) {
+    if (!img) return;
+    cv.setPointerCapture(e.pointerId);
+    var p = pos(e);
+    drag = { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
+    draw();
+  });
+
+  cv.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var p = pos(e);
+    drag.x1 = p.x; drag.y1 = p.y;
+    draw();
+  });
+
+  cv.addEventListener('pointerup', function (e) {
+    if (!drag) return;
+    var box = normalizeRect(drag.x0, drag.y0, drag.x1, drag.y1, cssW, cssH);
+    drag = null;
+    if (!box) { setStatus('框太小或没拖动，已忽略。', 'warn'); draw(); return; }
+    rects[active] = box;
+    var nextEmpty = REGIONS.filter(function (r) { return !rects[r]; })[0];
+    if (nextEmpty) setActive(nextEmpty);
+    afterChange();
+  });
+
+  cv.addEventListener('pointercancel', function () { drag = null; draw(); });
+
+  function afterChange() {
+    var done = REGIONS.filter(function (r) { return rects[r]; }).length;
+    var missing = REGIONS.filter(function (r) { return !rects[r]; });
+    document.getElementById('export').disabled = done < 3;
+    document.getElementById('copy').disabled = done < 3;
+    document.getElementById('save').disabled = done < 3;
+    if (done < 3) {
+      setStatus('已框 ' + done + '/3，还差：' + missing.map(function (r) { return LABELS[r]; }).join('、'), 'warn');
+    } else {
+      setStatus('三个区域都齐了。生成 JSON 后记得在应用里跑「试识别」。', 'ok');
+    }
+    draw();
+  }
+
+  function setActive(r) {
+    active = r;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-region]'), function (b) {
+      b.classList.toggle('on', b.dataset.region === r);
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-region]'), function (b) {
+    b.addEventListener('click', function () { setActive(b.dataset.region); });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-orient]'), function (b) {
+    b.addEventListener('click', function () {
+      orientation = b.dataset.orient;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-orient]'), function (x) {
+        x.classList.toggle('on', x.dataset.orient === orientation);
+      });
+    });
+  });
+
+  document.getElementById('undo').addEventListener('click', function () {
+    var filled = REGIONS.filter(function (r) { return rects[r]; });
+    if (!filled.length) return;
+    var last = filled[filled.length - 1];
+    delete rects[last];
+    setActive(last);
+    afterChange();
+  });
+
+  document.getElementById('clear').addEventListener('click', function () {
+    rects = {}; setActive('handArea'); afterChange();
+  });
+
+  document.getElementById('reload').addEventListener('click', function () {
+    document.getElementById('file').click();
+  });
+
+  document.getElementById('pick').addEventListener('click', function () {
+    document.getElementById('file').click();
+  });
+
+  document.getElementById('file').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    if (f) loadFile(f);
+  });
+
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    stage.addEventListener(ev, function (e) { e.preventDefault(); stage.classList.add('drag'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    stage.addEventListener(ev, function (e) { e.preventDefault(); stage.classList.remove('drag'); });
+  });
+  stage.addEventListener('drop', function (e) {
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) loadFile(f);
+  });
+
+  function loadFile(file) {
+    if (!/^image\//.test(file.type)) { setStatus('这不是图片文件。', 'bad'); return; }
+    var url = URL.createObjectURL(file);
+    var im = new Image();
+    im.onload = function () {
+      img = im;
+      rects = {};
+      document.getElementById('hint').hidden = true;
+      cv.hidden = false;
+      document.getElementById('tools').hidden = false;
+      document.getElementById('legend').hidden = false;
+      outEl.value = '';
+      document.getElementById('export').disabled = true;
+      document.getElementById('copy').disabled = true;
+      document.getElementById('save').disabled = true;
+      setActive('handArea');
+      fitCanvas();
+      setStatus('图片 ' + im.naturalWidth + '×' + im.naturalHeight + '，先框「手牌区」。', '');
+      URL.revokeObjectURL(url);
+    };
+    im.onerror = function () { setStatus('图片读取失败，换一张试试。', 'bad'); URL.revokeObjectURL(url); };
+    im.src = url;
+  }
+
+  document.getElementById('export').addEventListener('click', function () {
+    var p = buildPreset();
+    if (p._missing.length) { setStatus('还缺区域，不能导出。', 'bad'); return; }
+    delete p._missing;
+    outEl.value = JSON.stringify(p, null, 2);
+    setStatus('已生成。导入应用后务必先「试识别」，确认无误再把 verified 改成 true。', 'ok');
+  });
+
+  document.getElementById('copy').addEventListener('click', function () {
+    if (!outEl.value) return;
+    outEl.select();
+    var done = function () { setStatus('已复制到剪贴板。', 'ok'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(outEl.value).then(done, function () { document.execCommand('copy'); done(); });
+    } else {
+      document.execCommand('copy'); done();
+    }
+  });
+
+  document.getElementById('save').addEventListener('click', function () {
+    if (!outEl.value) return;
+    var id = (document.getElementById('pid').value || 'layout').replace(/[^\w\-]+/g, '_');
+    var blob = new Blob([outEl.value], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = id + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === '1') setActive('handArea');
+    if (e.key === '2') setActive('countArea');
+    if (e.key === '3') setActive('playArea');
+    if (e.key === 'Escape') { drag = null; draw(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault(); document.getElementById('undo').click();
+    }
+  });
+
+  window.addEventListener('resize', function () { if (img) fitCanvas(); });
+
+  // 供自动化测试使用
+  window.__marker = { normalizeRect: normalizeRect, buildPreset: buildPreset };
+})();
+</script>
+</body>
+</html>
