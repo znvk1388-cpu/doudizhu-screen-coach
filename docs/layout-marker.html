@@ -26,6 +26,9 @@
     background:#0b0e13;border:1px dashed var(--line);border-radius:12px;overflow:hidden}
   .stage.drag{border-color:var(--accent);background:#0d1420}
   .stage canvas{display:block;max-width:100%;cursor:crosshair;touch-action:none}
+  /* 作者样式里的 display:block 会盖掉 hidden 属性的 display:none，必须显式补回来，
+     否则没选图时会先露出一个 300x150 的空画布 */
+  .stage canvas[hidden]{display:none}
   .hint{color:var(--muted);font-size:13.5px;text-align:center;padding:26px}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 0}
   button{font:inherit;font-size:13.5px;padding:7px 12px;border-radius:9px;cursor:pointer;
