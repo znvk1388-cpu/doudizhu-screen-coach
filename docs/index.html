@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>斗地主屏幕记牌 · 下载与校验</title>
+<meta name="description" content="Android 本地屏幕识牌记牌器。无网络权限、无账号、不上传。提供 APK 校验值与安装说明。">
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a21; --panel-2:#1c222b; --line:#2a323d;
+    --text:#e8ecf2; --muted:#98a4b3; --accent:#4c8dff; --accent-2:#6ee7b7;
+    --warn:#f0b429; --danger:#ff6b6b; --ok:#4ade80;
+    --radius:14px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 15% -10%, #1b2434 0%, transparent 60%),
+               radial-gradient(900px 500px at 90% 0%, #1a2b26 0%, transparent 55%),
+               var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px 80px}
+  header{padding:56px 0 28px}
+  .badge{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;letter-spacing:.4px;
+    color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--line);
+    padding:5px 11px;border-radius:999px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 10px var(--accent-2)}
+  h1{font-size:clamp(28px,4.6vw,42px);line-height:1.2;margin:18px 0 12px;letter-spacing:-.5px}
+  .sub{color:var(--muted);font-size:16px;max-width:62ch;margin:0}
+  .kicker{color:var(--accent);font-size:13px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase}
+
+  .notice{margin:28px 0 8px;border-radius:var(--radius);padding:16px 18px;font-size:14.5px;
+    background:linear-gradient(180deg,rgba(240,180,41,.12),rgba(240,180,41,.05));
+    border:1px solid rgba(240,180,41,.35)}
+  .notice b{color:var(--warn)}
+  .notice p{margin:6px 0 0;color:#d9d2c3}
+
+  h2{font-size:20px;margin:44px 0 14px;letter-spacing:-.2px;display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:3px;height:18px;background:var(--accent);border-radius:2px}
+  p{color:#c8d2de}
+  .muted{color:var(--muted)}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+
+  .card{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px}
+  .card.reco{border-color:rgba(76,141,255,.5);box-shadow:0 0 0 1px rgba(76,141,255,.15),0 18px 40px -24px rgba(76,141,255,.5)}
+  .card h3{margin:0 0 4px;font-size:17px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tag{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;letter-spacing:.3px}
+  .tag.reco{background:rgba(76,141,255,.16);color:#9cc3ff;border:1px solid rgba(76,141,255,.4)}
+  .tag.alt{background:rgba(110,231,183,.12);color:#8ff0c9;border:1px solid rgba(110,231,183,.35)}
+  .fname{font-family:var(--mono);font-size:12.5px;color:var(--muted);word-break:break-all;margin:10px 0}
+  .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:12px 0 16px}
+  .meta span b{color:#dbe4ef;font-weight:600}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;
+    padding:12px 16px;border-radius:10px;font-size:14.5px;font-weight:600;text-decoration:none;
+    transition:transform .12s ease,filter .12s ease;cursor:pointer;border:1px solid transparent}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:linear-gradient(180deg,#5a97ff,#3a78e8);color:#fff;box-shadow:0 10px 24px -12px rgba(76,141,255,.9)}
+  .btn-primary:hover{filter:brightness(1.07)}
+  .btn-ghost{background:rgba(255,255,255,.04);border-color:var(--line);color:#dbe4ef}
+  .btn-ghost:hover{background:rgba(255,255,255,.07)}
+
+  .hashbox{margin-top:14px;background:#0b0e13;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .hashbox .lbl{font-size:11px;letter-spacing:.6px;color:#7b8794;text-transform:uppercase}
+  .hashrow{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .hash{font-family:var(--mono);font-size:11.5px;color:#9fb0c4;word-break:break-all;flex:1;line-height:1.45}
+  .copy{flex:none;font-size:11.5px;color:var(--accent);background:none;border:1px solid var(--line);
+    border-radius:6px;padding:3px 8px;cursor:pointer}
+  .copy:hover{border-color:var(--accent)}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase}
+  td code{font-family:var(--mono);font-size:12.5px;background:rgba(255,255,255,.05);
+    padding:1.5px 6px;border-radius:5px;color:#bcd0e6}
+  tr:last-child td{border-bottom:none}
+
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  ol.steps>li{counter-increment:s;position:relative;padding:0 0 18px 44px;border-left:1px solid var(--line);margin-left:14px}
+  ol.steps>li:last-child{border-left-color:transparent;padding-bottom:0}
+  ol.steps>li::before{content:counter(s);position:absolute;left:-14px;top:-2px;width:28px;height:28px;
+    border-radius:50%;background:var(--panel-2);border:1px solid var(--line);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  ol.steps h4{margin:0 0 4px;font-size:15px}
+  ol.steps p{margin:0;font-size:14px;color:var(--muted)}
+
+  pre{background:#0b0e13;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;
+    font-family:var(--mono);font-size:12.5px;color:#a9bcd2;line-height:1.6;margin:10px 0}
+  code.inline{font-family:var(--mono);font-size:12.5px;background:rgba(255,255,255,.06);
+    padding:1.5px 6px;border-radius:5px;color:#bcd0e6}
+
+  .kv{display:grid;grid-template-columns:150px 1fr;gap:8px 16px;font-size:14px}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0;color:#dbe4ef}
+  @media(max-width:600px){.kv{grid-template-columns:1fr}.kv dt{margin-top:6px}}
+
+  .callout{border-left:3px solid var(--danger);background:rgba(255,107,107,.07);padding:12px 16px;
+    border-radius:0 10px 10px 0;font-size:14px;color:#f0c9c9;margin:14px 0}
+  .callout.ok{border-left-color:var(--ok);background:rgba(74,222,128,.07);color:#c8f0d8}
+
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;color:#6f7c8b}
+  footer a{color:#8ba3bd;text-decoration:none;border-bottom:1px dotted #3d4a5a}
+  a{color:#9cc3ff}
+  .pill{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:999px;
+    border:1px solid var(--line);color:var(--muted);margin-right:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="badge"><span class="dot"></span>v0.6.16 · 2026-11-11 构建</span>
+  <h1>斗地主屏幕记牌</h1>
+  <p class="sub">在你主动授权的前提下读取牌桌画面，统计还没出的牌，用浮窗和中文语音提示。<br>
+  没有网络权限，没有账号，画面不落地。不确定时它会停下来，而不是猜。</p>
+</header>
+
+<div class="notice">
+  <b>⚠ 关于当前签名，请先看一眼</b>
+  <p>v0.6.16 的两个安装包仍使用 Android <b>调试证书</b>（<code class="inline">CN=Android Debug</code>）签名。
+  调试证书的私钥是公开的，理论上任何人都能伪造一个"可覆盖升级"的同名包。这不影响功能，但影响"你装的到底是不是作者发的"。
+  正式证书版本正在准备中，届时包名会变更且需要手动迁移配置（<a href="#migrate">迁移说明</a>）。
+  在此之前，请<b>务必用下面的 SHA-256 校验你的下载</b>。</p>
+</div>
+
+<h2>下载</h2>
+<div class="grid">
+
+  <div class="card reco">
+    <h3>轻量版 <span class="tag reco">推荐大多数人</span></h3>
+    <div class="fname">doudizhu-coach-0.6.16-android-lite-arm64.apk</div>
+    <div class="meta">
+      <span>体积 <b>13.9 MB</b></span>
+      <span>含 <b>屏幕识牌 + 中文播报</b></span>
+      <span><b>不申请</b>麦克风</span>
+    </div>
+    <a class="btn btn-primary" href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.16/doudizhu-coach-0.6.16-android-lite-arm64.apk">下载轻量版 APK</a>
+    <div class="hashbox">
+      <div class="lbl">SHA-256</div>
+      <div class="hashrow">
+        <span class="hash" id="h-lite">d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98</span>
+        <button class="copy" data-copy="h-lite">复制</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>完整版 <span class="tag alt">多一个语音入口</span></h3>
+    <div class="fname">doudizhu-coach-0.6.16-android-arm64.apk</div>
+    <div class="meta">
+      <span>体积 <b>75.3 MB</b></span>
+      <span>额外含 <b>听朋友报牌</b></span>
+      <span>会申请<b>麦克风</b></span>
+    </div>
+    <a class="btn btn-ghost" href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.16/doudizhu-coach-0.6.16-android-arm64.apk">下载完整版 APK</a>
+    <div class="hashbox">
+      <div class="lbl">SHA-256</div>
+      <div class="hashrow">
+        <span class="hash" id="h-full">31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724</span>
+        <button class="copy" data-copy="h-full">复制</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="muted" style="font-size:13.5px;margin-top:12px">
+  两版同包名、同 versionCode，<b>可以互相覆盖安装</b>。只想记牌选轻量版：体积小 5 倍，且不涉及麦克风。
+  完整版的语音功能需要额外处理声纹，属于敏感信息，请先读<a href="#voice">声纹说明</a>。
+</p>
+
+<h2>安装前：先核对这两个值</h2>
+<p>不要只凭"文件名对"就安装。以下两个值只要有一个不符，就说明文件被篡改或没下完整。</p>
+
+<dl class="kv">
+  <dt>包名</dt><dd><code class="inline">com.mengw.doudizhu.voice</code></dd>
+  <dt>版本</dt><dd>0.6.16（versionCode 22）</dd>
+  <dt>系统要求</dt><dd>Android 8.0 及以上（minSdk 26）</dd>
+  <dt>架构</dt><dd><b>仅 arm64-v8a</b>（近几年的手机都是；老 32 位机型装不上）</dd>
+  <dt>targetSdk</dt><dd>35（Android 15）</dd>
+  <dt>签名证书 SHA-256</dt>
+  <dd><code class="inline">3E:63:5A:55:A7:58:2B:3D:D8:34:24:FD:40:78:C4:FE:CB:39:AE:1C:A4:1C:1B:7C:2A:C2:17:D3:A5:11:72:BC</code><br>
+  <span class="muted" style="font-size:13px">这个指纹对应 <code class="inline">CN=Android Debug</code>，即调试证书。它<b>不是</b>作者身份证明，见首屏说明。</span></dd>
+</dl>
+
+<h3 style="margin-top:26px;font-size:15.5px">在 Windows 上校验（不需要装 Android 工具）</h3>
+<p class="muted" style="font-size:14px">把下载的 APK 拖到 <code class="inline">verify-apk.bat</code> 上即可，它会输出文件哈希与签名证书指纹，并与上方公布值比对。</p>
+<pre>verify-apk.bat "D:\Downloads\doudizhu-coach-0.6.16-android-lite-arm64.apk"
+:: 或者带上期望值，自动判定通过/失败
+powershell -NoProfile -ExecutionPolicy Bypass -File verify-apk.ps1 ^
+  -Path "D:\Downloads\doudizhu-coach-0.6.16-android-lite-arm64.apk" ^
+  -ExpectedSha256 d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98</pre>
+
+<h3 style="margin-top:22px;font-size:15.5px">在手机上校验（可选）</h3>
+<pre># 用任意终端 App，或电脑 adb
+sha256sum doudizhu-coach-0.6.16-android-lite-arm64.apk
+# 期望：d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98</pre>
+
+<h2>安装步骤</h2>
+<ol class="steps">
+  <li><h4>允许安装未知来源应用</h4>
+    <p>系统会提示"出于安全考虑已阻止"。点提示里的"设置"，允许你的浏览器或文件管理器安装应用即可。</p></li>
+  <li><h4>安装并打开，先别急着开局</h4>
+    <p>进入主界面 →「使用指南与检查」，按提示依次确认：通知、悬浮窗（可选）、中文离线语音（可选）。</p></li>
+  <li><h4>开始识牌，选对应用</h4>
+    <p>点「开始读取游戏画面」→ 在系统弹窗里选择斗地主游戏（或微信小程序）。如果系统只允许选单个应用，<b>一定要选游戏本身</b>，选错会读不到牌桌。</p></li>
+  <li><h4>切到游戏，横屏停留几秒</h4>
+    <p>当前版本以横屏牌桌为主。竖屏牌桌的支持还在做，若你的游戏是竖屏，可能识别不准。</p></li>
+  <li><h4>校准区域，然后试识别</h4>
+    <p>从通知栏或主界面进入校准，依次框选牌点区、张数区、出牌区。<b>校准完一定点"试识别"</b>，确认识别结果与实际牌面一致再开局。</p></li>
+  <li><h4>从"完整新局"开始</h4>
+    <p>必须从第一手开始记，不能中途接入。中途接入会导致余量对不上。</p></li>
+</ol>
+
+<h2>兼容性与已知问题</h2>
+<table>
+  <thead><tr><th>项目</th><th>状态</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td>Android 8.0 – 15</td><td>支持</td><td>minSdk 26 / targetSdk 35</td></tr>
+    <tr><td>Android 16+</td><td>未验证</td><td>尚未在 Android 16 上做过整局验收</td></tr>
+    <tr><td>64 位 ARM 手机</td><td>支持</td><td>2018 年后的机型基本都是</td></tr>
+    <tr><td>32 位 / x86 模拟器</td><td><b>不支持</b></td><td>安装包只含 arm64-v8a，会提示"应用与此设备不兼容"</td></tr>
+    <tr><td>竖屏牌桌</td><td>受限</td><td>校准页强制横屏；竖屏支持在计划中</td></tr>
+    <tr><td>华为 / 荣耀</td><td>需手动设置</td><td>锁屏后可能被清理后台，需在"应用启动管理"里设为手动管理</td></tr>
+    <tr><td>小米 / Redmi</td><td>需手动设置</td><td>需允许"后台弹出界面"，否则浮窗不显示</td></tr>
+    <tr><td>OPPO / vivo</td><td>需手动设置</td><td>自启动、后台高耗电、悬浮窗开关需分别允许</td></tr>
+    <tr><td>游戏主动隐藏浮窗</td><td>已知限制</td><td>部分游戏会屏蔽悬浮层，此时请从通知栏查看</td></tr>
+    <tr><td>识别准确率</td><td><b>尚无真机公开数据</b></td><td>当前版本的测试为模拟环境；真机整局数据正在补。请不要把它当"绝对准"</td></tr>
+  </tbody>
+</table>
+
+<h2 id="voice">完整版的语音与声纹</h2>
+<p>"听朋友报牌"需要分辨是哪位朋友在说话，因此会提取<b>声纹</b>。声纹属于敏感个人信息，请了解这几点再决定是否使用：</p>
+<ul style="color:#c8d2de;font-size:14.5px">
+  <li>原始录音<b>不保存</b>，只在本机存数学向量，不上传（应用没有网络权限）。</li>
+  <li>建议 30 天未使用自动删除，并支持逐人删除、一次清空。</li>
+  <li><b>你需要先告知朋友并取得对方同意</b>，不要在对方不知情时采集他人声音。</li>
+  <li>如果你只需要记牌，<b>用轻量版就好</b>，它完全不涉及麦克风。</li>
+</ul>
+
+<h2 id="migrate">换正式签名时怎么迁移</h2>
+<div class="callout">
+  <b>顺序不能错：先导出模板，再卸载/装新版，最后导入。</b>
+  因为签名或包名变更后，新旧版本无法互相读取数据（Android 的安全机制），而本应用不联网也没有云备份，卸载即清除。
+</div>
+<ol class="steps">
+  <li><h4>导出区域模板</h4><p>主界面 →「区域模板」→「备份／导入区域模板」→ 导出为文件，记住保存位置。</p></li>
+  <li><h4>需要保留的牌局先截图</h4><p>牌局记录目前没有结构化导出，重要对局请先截图留档。</p></li>
+  <li><h4>安装新版（可与旧版共存）</h4><p>新版会使用新包名，不会覆盖旧版，两者可以同时存在。</p></li>
+  <li><h4>在新版导入模板并重新试识别</h4><p>导入后仍需确认识别结果正确，不要直接开局。</p></li>
+  <li><h4>确认无误后再卸载旧版</h4><p>旧版将停止更新。</p></li>
+</ol>
+
+<h2>这个应用不做什么</h2>
+<table>
+  <thead><tr><th>常见能力</th><th>本应用</th><th>原因</th></tr></thead>
+  <tbody>
+    <tr><td>联网 / 账号 / 云同步</td><td><b>没有</b></td><td>安装包里没有 INTERNET 权限，数据无法上传</td></tr>
+    <tr><td>无障碍服务</td><td><b>没有</b></td><td>不读取其他应用界面结构，不代替你点击</td></tr>
+    <tr><td>读取游戏内存</td><td><b>没有</b></td><td>只处理你授权的屏幕画面</td></tr>
+    <tr><td>自动出牌 / AI 建议</td><td><b>没有</b></td><td>不介入操作；这类功能也会带来公平性争议</td></tr>
+    <tr><td>存储权限</td><td><b>没有</b></td><td>导入导出走系统文件选择器，只碰你亲手选的那个文件</td></tr>
+  </tbody>
+</table>
+<div class="callout ok" style="margin-top:18px">
+  <b>一句实话：</b>技术只读不等于平台许可。游戏是否允许使用第三方辅助工具由平台规则决定，
+  我们<b>不承诺</b>"不会被封号"，也<b>不承诺</b>"100% 准确"。请仅用于娱乐对局，不要用于任何涉及现金的牌局。
+</div>
+
+<h2>版本记录</h2>
+<table>
+  <thead><tr><th>版本</th><th>日期</th><th>主要变化</th></tr></thead>
+  <tbody>
+    <tr><td>0.6.16</td><td>2026-11-11</td><td>当前版本。提供轻量版/完整版；支持经典、不洗牌、连炸、单癞子（手动核对）、2v2；浮窗余量与播报。</td></tr>
+    <tr><td>1.0（计划）</td><td>待定</td><td>正式签名与新包名；浮窗逐家出牌历史；预置布局与竖屏；异常恢复状态机；正式隐私政策。</td></tr>
+  </tbody>
+</table>
+
+<footer>
+  <div style="margin-bottom:10px">
+    <span class="pill">无网络权限</span><span class="pill">无账号</span><span class="pill">无无障碍</span><span class="pill">画面不落地</span>
+  </div>
+  源码与发布记录：<a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach">github.com/znvk1388-cpu/doudizhu-screen-coach</a><br>
+  隐私政策：<a href="./privacy.html">v1.0（2026-11-11 生效）</a>　
+  联系：<a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/issues" rel="noopener">GitHub Issues</a>　
+  校验脚本：<a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/tree/main/tools" rel="noopener">tools/</a><br>
+  <span class="muted" style="font-size:12.5px">本页所列 SHA-256 与签名指纹均由实际安装包解析得出，可用随附脚本独立复核。</span>
+</footer>
+
+</div>
+<script>
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var el = document.getElementById(btn.dataset.copy);
+      var text = el ? el.textContent.trim() : '';
+      var done = function () {
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        setTimeout(function () { btn.textContent = old; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () {});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+</script>
+</body>
+</html>

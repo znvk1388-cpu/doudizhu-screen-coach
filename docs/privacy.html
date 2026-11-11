@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>斗地主屏幕记牌 · 隐私政策 v1.0</title>
+<meta name="description" content="斗地主屏幕记牌 隐私政策：不联网、不注册、不上传，识别全部在本机完成。">
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a21; --panel-2:#1c222b; --line:#2a323d;
+    --text:#e8ecf2; --muted:#98a4b3; --accent:#4c8dff; --accent-2:#6ee7b7;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:48px 20px 96px}
+  a{color:#9cc3ff}
+  h1{font-size:clamp(24px,4vw,34px);line-height:1.25;margin:8px 0 6px;letter-spacing:-.4px}
+  h2{font-size:19px;margin:38px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:16px;margin:24px 0 8px}
+  p{color:#c8d2de;margin:10px 0}
+  ul,ol{color:#c8d2de;padding-left:22px}
+  li{margin:5px 0}
+  code{font-family:var(--mono);font-size:12.5px;background:rgba(255,255,255,.06);
+    padding:1.5px 6px;border-radius:5px;color:#bcd0e6}
+  pre{background:#0b0e13;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto}
+  pre code{background:none;padding:0;color:#a9bcd2}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;display:block;overflow-x:auto}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:12.5px;letter-spacing:.3px;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  blockquote{margin:16px 0;padding:10px 16px;border-left:3px solid var(--accent);
+    background:rgba(76,141,255,.06);color:#c8d2de;border-radius:0 10px 10px 0}
+  blockquote p{margin:4px 0}
+  hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+  .head{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:8px}
+  .meta{color:var(--muted);font-size:14px}
+  .meta b{color:#dbe4ef;font-weight:600}
+  .top{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 0;font-size:12.5px;color:var(--muted)}
+  .top span{border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .back{display:inline-block;margin-bottom:20px;font-size:13.5px;text-decoration:none;
+    border-bottom:1px dotted #3d4a5a}
+  footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:#6f7c8b}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="./index.html">← 返回下载页</a>
+<div class="head">
+  <h1>斗地主屏幕记牌 隐私政策</h1>
+  <div class="meta">版本 <b>v1.0</b>　生效日期 <b>2026-11-11</b>　运营者 <b>个人开发者（GitHub @znvk1388-cpu）</b></div>
+  <div class="top"><span>不联网</span><span>不注册</span><span>不上传</span><span>画面不落地</span></div>
+</div>
+<p><strong>生效日期：2026-11-11</strong>
+<strong>运营者：个人开发者（GitHub @znvk1388-cpu）</strong>
+<strong>联系方式：<a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/issues" rel="noopener">GitHub Issues 页面</a></strong></p>
+<h2 id="_1">摘要（请先读这三句）</h2>
+<ol>
+<li>本应用<strong>不联网、不注册、不上传</strong>。它没有申请网络权限，技术上无法把你的数据发出去。</li>
+<li>屏幕识别与语音识别<strong>全部在本机完成</strong>，识别过程中的画面与声音<strong>不会被保存为图片、视频或录音</strong>。</li>
+<li>所有数据存在你手机的应用私有目录里，卸载应用即随之删除。你可以随时在应用内删除。</li>
+</ol>
+<hr>
+<h2 id="_2">一、我们处理哪些信息、为什么处理</h2>
+<p>本应用只在你主动开启对应功能时才处理信息。<strong>不开启，就不处理。</strong></p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>处理的信息</th>
+<th>目的</th>
+<th>是否必需</th>
+<th>保存位置与期限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>屏幕记牌（核心功能）</td>
+<td>你主动共享的游戏画面（内存中的帧）</td>
+<td>识别牌面，统计剩余牌</td>
+<td>是（核心功能）</td>
+<td><strong>不保存画面</strong>。仅在内存中处理，识别完成后丢弃；最近一帧预览仅存活于当前页面</td>
+</tr>
+<tr>
+<td>记牌结果</td>
+<td>牌局记录（手数、出牌、点数余量）、待确认条目</td>
+<td>向你展示、支持撤销与复盘</td>
+<td>是</td>
+<td>应用私有目录，直到你删除该局或卸载应用</td>
+</tr>
+<tr>
+<td>校准模板</td>
+<td>你框选的屏幕区域坐标、玩法名称</td>
+<td>免去每次重新校准</td>
+<td>否（可不用）</td>
+<td>应用私有目录，直到你删除或卸载</td>
+</tr>
+<tr>
+<td>悬浮窗</td>
+<td>无（只读取上述记牌结果做显示）</td>
+<td>在游戏上层显示余牌</td>
+<td>否</td>
+<td>不额外保存</td>
+</tr>
+<tr>
+<td>中文播报</td>
+<td>播报文本（由记牌结果生成）</td>
+<td>语音提示关键牌</td>
+<td>否</td>
+<td><strong>不保存音频</strong>，交由系统文字转语音引擎实时朗读</td>
+</tr>
+<tr>
+<td>听朋友报牌（仅完整版）</td>
+<td>麦克风采集的现场声音；说话人声纹特征向量</td>
+<td>分辨是哪位朋友报了哪张牌</td>
+<td>否（默认关闭）</td>
+<td>原始音频<strong>不保存</strong>，处理后即丢弃；声纹向量存应用私有目录，默认 <strong>30 天未使用自动删除</strong>，可随时逐人删除</td>
+</tr>
+<tr>
+<td>诊断导出</td>
+<td>设备型号、系统版本、识牌文本与置信度、牌局事件、耗时</td>
+<td>你主动排障时使用</td>
+<td>否（需你手动触发）</td>
+<td><strong>只在你点击导出时生成</strong>，保存到你选择的位置；不含截图、像素、原始音频</td>
+</tr>
+</tbody>
+</table>
+<p><strong>我们不处理</strong>：通讯录、短信、通话记录、位置、相册、剪贴板、应用列表、设备唯一标识（IMEI/Android ID/广告 ID）、身份证件、金融账户。</p>
+<h2 id="_3">二、我们不申请的权限，以及为什么</h2>
+<p>这部分是本应用与同类工具最主要的区别，请重点核对系统设置里的授权列表：</p>
+<table>
+<thead>
+<tr>
+<th>权限</th>
+<th>是否申请</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>INTERNET</code>（网络）</td>
+<td><strong>不申请</strong></td>
+<td>无任何服务器，无法上传或下载数据</td>
+</tr>
+<tr>
+<td>无障碍服务（AccessibilityService）</td>
+<td><strong>不申请</strong></td>
+<td>不读取其他应用的界面结构，不代替你点击</td>
+</tr>
+<tr>
+<td>存储读写 / 全部文件访问</td>
+<td><strong>不申请</strong></td>
+<td>导入导出统一走系统文件选择器，只拿到你亲手选中的那一个文件</td>
+</tr>
+<tr>
+<td>通讯录 / 位置 / 电话 / 短信</td>
+<td><strong>不申请</strong></td>
+<td>与功能无关</td>
+</tr>
+<tr>
+<td>屏幕捕获（MediaProjection）</td>
+<td>申请，需你每次确认</td>
+<td>Android 强制要求：每次开始识牌都必须由你在系统弹窗里点"立即开始"，无法静默开启</td>
+</tr>
+<tr>
+<td>悬浮窗（在其他应用上层显示）</td>
+<td>申请，可在系统设置关闭</td>
+<td>只用于显示余牌；关闭后核心记牌仍可用，只是看不到浮窗</td>
+</tr>
+<tr>
+<td>通知</td>
+<td>申请，可拒绝</td>
+<td>用于从通知栏校准/停止识牌；拒绝后仍可从应用内操作</td>
+</tr>
+<tr>
+<td>麦克风（仅完整版）</td>
+<td>申请，默认关闭</td>
+<td>只在"听朋友报牌"或"注册声音"时使用；屏幕记牌全程不需要</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>如果某个版本实际申请了上表标注"不申请"的权限，请以你手机上"应用信息 → 权限"的显示为准，并联系我们。</p>
+</blockquote>
+<h2 id="_4">三、敏感个人信息：声纹（仅完整版）</h2>
+<p><strong>这是本政策中最需要你注意的一段。</strong></p>
+<ol>
+<li><strong>声纹属于敏感个人信息。</strong> 依据《个人信息保护法》第 28 条，生物识别信息属于敏感个人信息，只有具有特定目的和充分必要性、并采取严格保护措施时才可处理。</li>
+<li><strong>我们为什么需要它</strong>：完整版的"听朋友报牌"要区分"这句话是谁说的"，只能通过声音特征区分不同的人。这是该功能的<strong>必要前提</strong>，没有替代方案。</li>
+<li><strong>对你的影响</strong>：声纹一旦泄露或被滥用，可能被用于冒认身份。因此我们<strong>只在本机保存数学向量</strong>（不是可还原的录音），不做任何上传，并默认 30 天未使用即删除。</li>
+<li><strong>我们需要你的单独同意。</strong> 首次使用该功能时，会单独弹出一页说明（不是勾选整份协议），你必须明确点"同意并开启"才会开始采集。<strong>拒绝不影响屏幕记牌等其它功能。</strong></li>
+<li><strong>涉及他人</strong>：如果你要识别朋友的声音，<strong>你需要在开始前告知对方并取得对方同意</strong>。应用会在注册每个声音前要求你确认这一点。你不得在对方不知情的情况下采集他人声音。</li>
+<li><strong>你可以随时</strong>：删除某一个朋友的声纹、清空全部声纹、关闭该功能。删除后不可恢复，但不影响已生成的牌局记录。</li>
+</ol>
+<p>详细机制见同目录《声纹单独同意与数据生命周期》。</p>
+<h2 id="_5">四、我们不会做的事</h2>
+<ul>
+<li>不出售、不出租、不交换你的任何信息。</li>
+<li>不向第三方提供、共享、转让你的信息（因为我们没有服务器，也没有接收方）。</li>
+<li>不进行跨境传输。</li>
+<li>不进行用户画像、个性化推荐、自动化决策。</li>
+<li>不在后台静默采集：屏幕捕获每次都需要你手动确认；麦克风仅在功能开启时工作，且状态栏会显示麦克风使用标识。</li>
+<li>不接入广告 SDK、统计 SDK、崩溃上报 SDK。</li>
+</ul>
+<p><strong>关于第三方组件</strong>：本应用包含 Google ML Kit（本地文字识别）、sherpa-onnx / ONNX Runtime（本地语音与声纹计算）、AndroidX 等开源组件。它们在<strong>本机内</strong>完成计算，<strong>不向 Google 或任何服务器发送数据</strong>。系统"文字转语音"由你手机的系统语音引擎提供，其行为受手机厂商/系统设置约束，我们无法控制，也不会向其传递除播报文本外的任何内容。完整组件清单见应用内"第三方组件说明"。</p>
+<h2 id="_6">五、你的权利与行使方式</h2>
+<table>
+<thead>
+<tr>
+<th>权利</th>
+<th>如何行使</th>
+<th>响应时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>查阅、复制</td>
+<td>应用内"本机数据"页可查看全部记录；模板与诊断可导出为文件</td>
+<td>即时</td>
+</tr>
+<tr>
+<td>更正、补充</td>
+<td>记牌结果支持逐手补录、撤销上一手</td>
+<td>即时</td>
+</tr>
+<tr>
+<td>删除</td>
+<td>"本机数据"页可删除单局/全部牌局/模板/声纹；或直接卸载应用</td>
+<td>即时</td>
+</tr>
+<tr>
+<td>撤回同意</td>
+<td>系统设置关闭屏幕捕获/悬浮窗/麦克风/通知；应用内关闭"听朋友报牌"</td>
+<td>即时生效</td>
+</tr>
+<tr>
+<td>注销</td>
+<td>本应用无账号，不存在注销；卸载即彻底清除</td>
+<td>——</td>
+</tr>
+<tr>
+<td>投诉、问询</td>
+<td>通过<a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/issues" rel="noopener">GitHub Issues 页面</a>提交</td>
+<td>15 个工作日内答复</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>说明：因为数据只存在你的手机上、我们没有副本，所以"删除"是<strong>真的删除</strong>，不存在"我们服务器上还留一份"的情况；反过来，一旦删除我们<strong>也无法帮你恢复</strong>，请谨慎操作。</p>
+</blockquote>
+<h2 id="_7">六、保存期限与安全措施</h2>
+<ul>
+<li><strong>画面/音频</strong>：不保存，处理完即丢弃。</li>
+<li><strong>牌局、模板、声纹</strong>：存于应用私有目录（<code>/data/data/&lt;包名&gt;/</code>），其他应用无法读取；<code>allowBackup=false</code>，不进入系统云备份。</li>
+<li><strong>声纹</strong>：默认 30 天未使用自动删除；你也可以立即删除。建议存储时使用 Android Keystore 加密（若当前版本尚未启用，我们会在更新说明中告知）。</li>
+<li><strong>诊断文件</strong>：仅在你导出时生成，由你决定存到哪里、发给谁。导出前应用会展示内容预览。</li>
+<li><strong>传输安全</strong>：不涉及，因为不存在网络传输。</li>
+</ul>
+<h2 id="_8">七、未成年人</h2>
+<p>本应用面向成年人娱乐场景。若你是不满 14 周岁的未成年人，请在父母或其他监护人陪同下阅读本政策，并在取得监护人同意后使用。依据《个人信息保护法》第 31 条，我们不会在未取得监护人同意的情况下处理不满 14 周岁未成年人的个人信息。由于本应用不收集身份信息、不上传数据，实际风险较低，但我们仍不建议未成年人在无监护下使用语音功能。</p>
+<h2 id="_9">八、政策更新</h2>
+<ul>
+<li>功能或处理方式发生变化时，我们会更新本政策并修改"生效日期"，在应用内与下载页同时公布。</li>
+<li>涉及处理目的、信息种类、共享对象等<strong>实质性变更</strong>时，会在你下次启动时以弹窗方式重新征求同意，而不是仅更新页面。</li>
+<li>历史版本可在下载页的"隐私政策历史"中查阅。</li>
+</ul>
+<h2 id="_10">九、联系我们</h2>
+<p>如对本政策有疑问、要行使上述权利、或认为我们的处理侵害了你的权益：</p>
+<ul>
+<li>联系方式：<a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/issues" rel="noopener">GitHub Issues 页面</a></li>
+<li>我们会在 15 个工作日内答复。</li>
+<li>你也可以向网信、工信、公安等监管部门投诉举报。</li>
+</ul>
+<hr>
+<h2 id="_11">附：一页速览（可做成应用内"隐私说明"页）</h2>
+<p>```
+本应用不联网 · 不注册 · 不上传</p>
+<p>屏幕画面：只在内存里看，不存图、不存视频
+声音：只在完整版"听朋友报牌"时采集，不存录音，只存声纹向量
+牌局与模板：存在你手机里，卸载就没
+麦克风：默认关闭，不用屏幕记牌完全不需要
+网络权限：没有申请。想传也传不出去</p>
+<p>你的数据你做主：应用内可查看、删除、导出；卸载即清空
+```</p>
+<footer>
+  本页为 斗地主屏幕记牌 的正式隐私政策，固定地址：<a href="https://znvk1388-cpu.github.io/doudizhu-screen-coach/privacy.html">https://znvk1388-cpu.github.io/doudizhu-screen-coach/privacy.html</a><br>
+  构建于 2026-11-11 15:19 +0800　·　政策变更时版本号与生效日期同步更新
+  <!-- build-fingerprint: 51ae0b1f2da933d6 -->
+</footer>
+</div>
+</body>
+</html>
