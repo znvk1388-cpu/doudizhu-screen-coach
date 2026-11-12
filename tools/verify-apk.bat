@@ -1,24 +1,19 @@
 @echo off
 setlocal
-rem Double-click helper for verify-apk.ps1 (ASCII only on purpose).
-rem Drag an .apk onto this file, or run: verify-apk.bat "D:\path\app.apk"
-
 if "%~1"=="" (
-  echo.
-  echo  Usage: drag an APK file onto this .bat
-  echo         or: verify-apk.bat "D:\path\app.apk"
-  echo.
+  echo Usage: drag an APK onto this file, or run verify-apk.bat "D:\path\app.apk"
   pause
   exit /b 2
 )
-
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0verify-apk.ps1" -Path "%~1"
 set RC=%ERRORLEVEL%
 echo.
 if "%RC%"=="0" (
-  echo  RESULT: PASS
+  echo RESULT: FILE HASH MATCH - see above for signature check status.
+) else if "%RC%"=="3" (
+  echo RESULT: UNVERIFIED - verification is incomplete. Do not assume this file is safe.
 ) else (
-  echo  RESULT: FAILED - do NOT install this file
+  echo RESULT: FAILED - do not install based on this check.
 )
 echo.
 pause

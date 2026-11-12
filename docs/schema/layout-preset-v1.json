@@ -1,99 +1,251 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://znvk1388-cpu.github.io/doudizhu-screen-coach/schema/layout-preset-v1.json",
-  "title": "斗地主屏幕记牌 · 区域布局预设",
-  "description": "归一化坐标(0-1)的牌桌区域预设。坐标为相对基准图的比例，使用时乘以实际屏幕/内容区宽高。与《P1-2-预置布局与竖屏支持-规格》第 2.1 节一致。",
+  "title": "安卓区域模板 v1（对应 0.6.16 LayoutTemplateDocument）",
+  "description": "按实际共享画面归一化。矩形为 [左,上,右,下]；左<右、上<下须由客户端额外检查。导入始终重新核对，不携带牌局、截图或声纹。",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schemaVersion",
-    "id",
-    "displayName",
-    "game",
-    "orientation",
-    "referenceResolution",
-    "aspectTolerance",
-    "regions",
-    "verified"
+    "format",
+    "version",
+    "layout"
   ],
   "properties": {
-    "schemaVersion": {
-      "const": 1,
-      "description": "格式版本。破坏性改动时递增，加载方需按版本分支。"
+    "format": {
+      "const": "doudizhu-screen-layout"
     },
-    "id": {
-      "type": "string",
-      "pattern": "^[a-z0-9][a-z0-9_\\-]{2,63}$",
-      "description": "英文小写标识，导入时用于去重与匹配，不用中文。"
+    "version": {
+      "const": 1
     },
-    "displayName": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 60
-    },
-    "game": {
-      "type": "string",
-      "enum": ["ddz"],
-      "description": "当前只支持斗地主三类场；后续玩法需先做 RuleSet 抽象。"
-    },
-    "orientation": {
-      "type": "string",
-      "enum": ["landscape", "portrait"],
-      "description": "生成该预设时牌桌的方向。套用前必须与当前画面方向一致，否则应拒绝并提示，不能硬套。"
-    },
-    "referenceResolution": {
+    "layout": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["w", "h"],
+      "required": [
+        "name",
+        "rule",
+        "hand",
+        "plays",
+        "counts",
+        "referenceAspectRatio"
+      ],
       "properties": {
-        "w": { "type": "integer", "minimum": 320, "maximum": 8000 },
-        "h": { "type": "integer", "minimum": 320, "maximum": 8000 }
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+        },
+        "rule": {
+          "enum": [
+            "CLASSIC_54",
+            "CLASSIC_CHAIN_54",
+            "TEAM_84",
+            "TEAM_108"
+          ]
+        },
+        "hand": {
+          "$ref": "#/definitions/region"
+        },
+        "plays": {
+          "type": "object"
+        },
+        "counts": {
+          "type": "object"
+        },
+        "referenceAspectRatio": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "mate": {
+          "enum": [
+            "SELF",
+            "LEFT",
+            "RIGHT",
+            "OPPOSITE"
+          ]
+        },
+        "first": {
+          "enum": [
+            "SELF",
+            "LEFT",
+            "RIGHT",
+            "OPPOSITE"
+          ]
+        },
+        "confirmed": {
+          "const": false,
+          "description": "导入仍须在应用内试识别确认。"
+        },
+        "chainSameLengthHighWins": {
+          "type": "boolean"
+        },
+        "handRows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "playRows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "englishJokers": {
+          "type": "boolean"
+        },
+        "controls": {
+          "$ref": "#/definitions/region"
+        },
+        "bottom": {
+          "$ref": "#/definitions/region"
+        }
       },
-      "description": "量取坐标时所用截图的原始像素尺寸，用于宽高比容差校验与问题复现。"
-    },
-    "aspectTolerance": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 0.25,
-      "description": "允许的宽高比偏差比例。超出则提示“该预设可能不适用”，默认 0.06。"
-    },
-    "regions": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["handArea", "countArea", "playArea"],
-      "properties": {
-        "handArea": { "$ref": "#/definitions/rect" },
-        "countArea": { "$ref": "#/definitions/rect" },
-        "playArea": { "$ref": "#/definitions/rect" }
-      }
-    },
-    "notes": {
-      "type": "string",
-      "maxLength": 300
-    },
-    "verified": {
-      "type": "boolean",
-      "description": "是否已在真机跑过“试识别”并确认识别正确。false 的预设不得默认推荐给用户。"
-    },
-    "coordinateSpace": {
-      "type": "string",
-      "enum": ["screen", "content"],
-      "default": "screen",
-      "description": "可选。坐标基准是整屏还是扣除系统栏后的内容区。Android 16 edge-to-edge 下二者不同，跨版本套用前必须一致，否则会整体偏移。缺省视为 screen。"
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "enum": [
+                  "CLASSIC_54",
+                  "CLASSIC_CHAIN_54"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "plays": {
+                "$ref": "#/definitions/plays3"
+              },
+              "counts": {
+                "$ref": "#/definitions/counts3"
+              },
+              "first": {
+                "enum": [
+                  "SELF",
+                  "LEFT",
+                  "RIGHT"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "plays": {
+                "$ref": "#/definitions/plays4"
+              },
+              "counts": {
+                "$ref": "#/definitions/counts4"
+              },
+              "mate": {
+                "enum": [
+                  "LEFT",
+                  "RIGHT",
+                  "OPPOSITE"
+                ]
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "definitions": {
-    "rect": {
+    "region": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "description": "[left,top,right,bottom]；还须检查左<右、上<下。"
+    },
+    "plays3": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["x", "y", "w", "h"],
       "properties": {
-        "x": { "type": "number", "minimum": 0, "maximum": 1 },
-        "y": { "type": "number", "minimum": 0, "maximum": 1 },
-        "w": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
-        "h": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+        "SELF": {
+          "$ref": "#/definitions/region"
+        },
+        "LEFT": {
+          "$ref": "#/definitions/region"
+        },
+        "RIGHT": {
+          "$ref": "#/definitions/region"
+        }
       },
-      "description": "归一化矩形。x+w 与 y+h 不得超过 1。"
+      "required": [
+        "SELF",
+        "LEFT",
+        "RIGHT"
+      ]
+    },
+    "counts3": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SELF": {
+          "$ref": "#/definitions/region"
+        },
+        "LEFT": {
+          "$ref": "#/definitions/region"
+        },
+        "RIGHT": {
+          "$ref": "#/definitions/region"
+        }
+      },
+      "required": [
+        "LEFT",
+        "RIGHT"
+      ]
+    },
+    "plays4": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SELF": {
+          "$ref": "#/definitions/region"
+        },
+        "LEFT": {
+          "$ref": "#/definitions/region"
+        },
+        "RIGHT": {
+          "$ref": "#/definitions/region"
+        },
+        "OPPOSITE": {
+          "$ref": "#/definitions/region"
+        }
+      },
+      "required": [
+        "SELF",
+        "LEFT",
+        "RIGHT",
+        "OPPOSITE"
+      ]
+    },
+    "counts4": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SELF": {
+          "$ref": "#/definitions/region"
+        },
+        "LEFT": {
+          "$ref": "#/definitions/region"
+        },
+        "RIGHT": {
+          "$ref": "#/definitions/region"
+        },
+        "OPPOSITE": {
+          "$ref": "#/definitions/region"
+        }
+      },
+      "required": [
+        "LEFT",
+        "RIGHT",
+        "OPPOSITE"
+      ]
     }
   }
 }

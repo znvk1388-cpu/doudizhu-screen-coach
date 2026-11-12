@@ -18,14 +18,22 @@ Windows和安卓各自独立运行的斗地主记牌工具。本仓库保存安�
 
 ## 校验下载
 
-下载后请先核对 SHA-256，再决定是否安装。`tools/` 里有免安装 Android SDK 的校验脚本：**把 APK 文件拖到 `tools/verify-apk.bat` 上**，会输出文件哈希与签名证书指纹；带上期望值可自动判定通过或失败（退出码 0/1）。详见 [tools/README.md](tools/README.md)。
+下载后可核对 SHA-256。下载页提供 [完整校验工具 ZIP](https://znvk1388-cpu.github.io/doudizhu-screen-coach/downloads/apk-check-tools.zip)，解压后把 APK 拖到 verify-apk.bat：默认与 releases.json 自动比对，未知文件显示未核验。文件哈希比对与完整 APK 签名验证分别报告；显式要求证书而缺少官方 apksigner 时不会按通过处理。详见 [tools/README.md](tools/README.md)。
 
 | 文件 | 体积（字节） | SHA-256 |
 | --- | --- | --- |
 | 轻量版<br>`doudizhu-coach-0.6.16-android-lite-arm64.apk` | 14,583,904 | `d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98` |
 | 完整版<br>`doudizhu-coach-0.6.16-android-arm64.apk` | 79,006,455 | `31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724` |
 
-**关于签名，需要说明清楚**：v0.6.16 两个安装包仍由 Android 调试证书（`CN=Android Debug`，证书 SHA-256 `3E635A55…`）签名。调试证书的私钥是公开的，因此**证书指纹不能作为身份证明**，任何人都能生成同指纹的同名包；能证明"文件没被换过"的是上面的 SHA-256。正式证书版本将随新包名发布，届时需手动迁移区域模板（先导出 → 卸载或装新版 → 导入 → 重新试识别）。
+**关于签名**：当前两个 APK 的证书显示 CN=Android Debug，属于调试签名。证书名称本身不能证明特定私钥公开，本仓库未确认该具体私钥的公开来源。先核对文件 SHA-256；需要签名有效性检查时使用 Android 官方 apksigner。正式签名迁移方案尚未发布；当前同签名覆盖安装无需卸载。换手机先导出模板，在新设备导入并试识别后，再决定是否处理旧应用数据。模板不含牌局和声纹。
+
+## 2026-11-12 网站修复
+
+- [区域标注器](https://znvk1388-cpu.github.io/doudizhu-screen-coach/layout-marker.html) 采用安卓 0.6.16 的 format/version/layout 协议，按座位标注，支持三人经典、连炸和两种 2v2 模板；导入仍须试识别。
+- 修改设置后导出最新内容；重画和清空可撤销；手机可点两个角或输入坐标。
+- 修正校验工具、隐私说明和迁移步骤，补 Windows 下载入口。本次不替换安装包。
+- 声纹逐人删除、自动清理、独立同意页和诊断预览尚未实装，不能把网页说明更新当作客户端已有功能。
+
 
 ## 区域模板备份与导入
 

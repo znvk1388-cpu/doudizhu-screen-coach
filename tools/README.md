@@ -1,90 +1,58 @@
-# 校验下载的安装包
+# 校验下载的安卓安装包
 
-这里的脚本不需要安装 Android SDK、不需要管理员权限，用来回答一个问题：**我下到的这个 APK，是不是作者发布的那个文件。**
+下载 [校验工具 ZIP](https://znvk1388-cpu.github.io/doudizhu-screen-coach/downloads/apk-check-tools.zip)，完整解压，三个文件 verify-apk.bat、verify-apk.ps1、releases.json 保持在同一目录。把 APK 拖到 verify-apk.bat 上。
 
-## 为什么需要自己校验
+默认不需要 Android SDK 或管理员权限。脚本会计算 SHA-256，并与附带清单中的两个 0.6.16 安装包比对，改过文件名也可以识别。未知文件显示 UNVERIFIED，绝不会按通过处理。
 
-v0.6.16 的两个 APK 使用 Android **调试证书**（`CN=Android Debug`）签名。调试证书的私钥是公开的，任何人都能生成一个同包名、同指纹的"升级包"。因此：
+## 两种检查的区别
 
-- **签名指纹相同**只能说明"两个包用了同一张调试证书"，**不能证明**作者身份；
-- 真正能证明"没被换过"的，是**文件 SHA-256 与官方公布值一致**。
+- FILE_HASH_MATCH：文件字节与清单或你提供的期望哈希一致。**不是独立的签名有效性验证，也不保证应用适合所有设备。**
+- APK_SIGNATURE_VERIFIED：额外调用 Android 官方 apksigner 验证了签名；有指定证书时，还会核对全部签名者指纹。
+- SIGNATURE_NOT_CHECKED：没有找到 apksigner，只完成文件哈希比对。
+- UNVERIFIED：检查未完成，不能当作通过。
 
-正式签名版本发布后，本文档会更新为"证书指纹比对"为主。
+清单与工具也应从本仓库取得。哈希一致回答的是“是不是同一个文件”，不单凭网页上的哈希建立作者身份。
 
-## 已发布版本
+## 命令行
 
-| 文件 | 体积（字节） | SHA-256 |
-|---|---|---|
-| `doudizhu-coach-0.6.16-android-lite-arm64.apk` | 14,583,904 | `d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98` |
-| `doudizhu-coach-0.6.16-android-arm64.apk` | 79,006,455 | `31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724` |
+~~~bat
+verify-apk.bat "D:\Downloads\renamed.apk"
+~~~
 
-签名证书 SHA-256（两版相同）：`3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC`
+单独给期望哈希（只进行文件一致性检查）：
 
-## 用法
+~~~powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-apk.ps1 -Path "D:\Downloads\app.apk" -ExpectedSha256 d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98
+~~~
 
-### Windows：双击 / 拖拽
+完整签名检查：安装 Android SDK Build Tools，设置好 Java，并将 apksigner 加到 PATH，或显式指定路径：
 
-把 APK 文件拖到 `verify-apk.bat` 上，或在命令行：
+~~~powershell
+.\verify-apk.ps1 -Path "D:\Downloads\app.apk" -ApkSigner "D:\Android\sdk\build-tools\35.0.0\apksigner.bat" -TrustedCertSha256 3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC
+~~~
 
-```bat
-verify-apk.bat "D:\Downloads\doudizhu-coach-0.6.16-android-lite-arm64.apk"
-```
+如 Java 未配置，可加 -JavaHome "D:\Java\jdk-17"。显式要求证书核验却没有 apksigner 时，以退出码 3 结束，不会静默跳过。
 
-带期望值可自动判定（不符则退出码 1）：
+[Android 官方 apksigner 文档](https://developer.android.com/tools/apksigner)。
 
-```bat
-powershell -NoProfile -ExecutionPolicy Bypass -File verify-apk.ps1 ^
-  -Path "D:\Downloads\doudizhu-coach-0.6.16-android-lite-arm64.apk" ^
-  -ExpectedSha256 d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98 ^
-  -TrustedCertSha256 3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC
-```
+## 已发布文件
 
-输出示例：
+| 文件 | SHA-256 |
+| --- | --- |
+| 轻量版 doudizhu-coach-0.6.16-android-lite-arm64.apk | d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98 |
+| 完整版 doudizhu-coach-0.6.16-android-arm64.apk | 31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724 |
 
-```
-File : D:\Downloads\doudizhu-coach-0.6.16-android-lite-arm64.apk
-Size : 14,583,904 bytes
+两版证书 SHA-256：3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC。
 
-SHA-256 (file) : D7EE3352CC54B553922F7AE083474DADA7C6541F30C17C5D6ACF36CA94F18E98
-[ OK ] SHA-256 matches the published value.
-Cert SHA-256   : 3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC
-[ OK ] Certificate matches a trusted fingerprint.
-
-[WARN] This is the well-known Android debug certificate (CN=Android Debug).
-```
-
-### Linux / macOS / Git Bash
-
-```bash
-sha256sum doudizhu-coach-0.6.16-android-lite-arm64.apk
-# macOS: shasum -a 256 <file>
-```
-
-### 有 Android SDK 的话
-
-```bash
-apksigner verify --print-certs --verbose doudizhu-coach-0.6.16-android-lite-arm64.apk
-```
+当前证书显示 CN=Android Debug，属于调试签名。仅凭这个名称不能证明该具体私钥公开；本页不作已泄露断言。正式签名及迁移方案尚未发布，请保留当前数据。
 
 ## 退出码
 
-| 码 | 含义 | 该怎么办 |
-|---|---|---|
-| 0 | 校验通过 | 可以安装 |
-| 1 | 哈希或证书不匹配、文件损坏 | **不要安装**，重新下载；仍不符请提 issue |
-| 2 | 参数缺失（没给文件路径） | 按提示拖文件或补参数 |
+| 码 | 含义 |
+| --- | --- |
+| 0 | 所要求的检查完成，具体范围看 FILE_HASH_MATCH / APK_SIGNATURE_VERIFIED |
+| 1 | 哈希不符、签名无效、证书不符或读取失败 |
+| 2 | 参数或清单格式错误 |
+| 3 | 未核验：未知文件、清单缺失，或要求的签名检查工具不可用 |
 
-## 脚本做了什么
-
-1. 读取整个文件算 SHA-256，与 `-ExpectedSha256` 比对；
-2. 定位 ZIP 末尾的 EOCD → 找到中央目录 → 往前读 **APK Signing Block**（`APK Sig Block 42`）；
-3. 遍历 ID-Value 对，取 v3（`0xf05368c0`）或 v2（`0x7109871a`）签名块，解析出第一个签名者证书的 DER，算 SHA-256；
-4. 若该指纹等于 Android 调试证书的公开指纹，打印告警。
-
-不依赖 `apksigner`、不依赖 Java，这也是脚本能在没装 SDK 的机器上直接跑的原因。
-
-## 已知限制
-
-- 只**解析**证书，不做完整签名验证（不校验签名本身是否有效、是否覆盖全部条目）。判断"文件有没有被换"用 SHA-256 更直接可靠。
-- 不支持只做了 v1（JAR）签名的 APK，遇到会打印 `[WARN] No APK Signing Block found` 并跳过证书比对。
-- Windows PowerShell 5.1 已测试；PowerShell 7 未测。
+脚本使用 PowerShell/.NET 计算哈希，签名验证交给官方 apksigner，不自行解析或验证 APK 签名块。Windows PowerShell 5.1 与 PowerShell 7 的测试结果见本轮交付记录。
