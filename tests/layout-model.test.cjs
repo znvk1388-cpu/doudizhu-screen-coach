@@ -65,3 +65,21 @@ test('undoing a region keeps the teammate selected afterwards', () => {
   d.mate='LEFT';d.undo();
   assert.equal(d.document().layout.mate,'LEFT');
 });
+test('remove one optional region preserves the rest and is undoable', () => {
+  const d=complete();d.setRegion('controls',{x:.2,y:.4,w:.1,h:.1});
+  const before=d.document();
+  assert.equal(typeof d.removeRegion,'function','selected-region removal must be available');
+  assert.equal(d.removeRegion('controls'),true);
+  const after=d.document();assert.equal(Object.hasOwn(after.layout,'controls'),false);
+  assert.deepEqual(after.layout.plays,before.layout.plays);
+  d.undo();assert.deepEqual(d.document(),before);
+});
+test('removing a required region blocks export; removing nothing leaves history unchanged', () => {
+  const d=complete();
+  assert.equal(typeof d.removeRegion,'function');
+  const history=d.history.length;
+  assert.equal(d.removeRegion('bottom'),false);assert.equal(d.history.length,history);
+  assert.equal(d.removeRegion('hand'),true);
+  assert.deepEqual(d.missing(),['hand']);assert.throws(()=>d.document(),/必选区域/);
+  d.undo();assert.deepEqual(d.missing(),[]);
+});

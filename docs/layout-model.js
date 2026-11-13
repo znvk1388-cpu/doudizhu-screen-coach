@@ -48,6 +48,10 @@
     this.snapshot(); this.rule = rule;
     Object.keys(this.rects).forEach(function (key) { if (allowed.indexOf(key) < 0) delete this.rects[key]; }, this);
   };
+  Draft.prototype.removeRegion = function (key) {
+    if (!Object.prototype.hasOwnProperty.call(this.rects, key)) return false;
+    this.snapshot(); delete this.rects[key]; return true;
+  };
   Draft.prototype.clear = function () {
     if (!Object.keys(this.rects).length) return;
     this.snapshot(); this.rects = {};

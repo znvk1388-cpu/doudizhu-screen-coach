@@ -19,8 +19,8 @@
   a{color:#9cc3ff}
   h1{font-size:clamp(22px,3.4vw,30px);margin:6px 0 8px;letter-spacing:-.4px}
   .sub{color:var(--muted);font-size:14.5px;margin:0 0 22px;max-width:70ch}
-  .layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
-  @media(max-width:980px){.layout{grid-template-columns:1fr}}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) clamp(280px,32vw,380px);gap:20px;align-items:start}
+  @media(max-width:760px){.layout{grid-template-columns:1fr}}
   .card{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:16px}
   .stage{position:relative;min-height:280px;display:flex;align-items:center;justify-content:center;
     background:#0b0e13;border:1px dashed var(--line);border-radius:12px;overflow:hidden}
@@ -49,7 +49,7 @@
   .kbd{font-family:var(--mono);font-size:11.5px;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;color:#bcd0e6}
   ol{margin:8px 0 0;padding-left:20px;color:#c8d2de;font-size:13.5px}
   ol li{margin:4px 0}
-  .foot{margin-top:26px;font-size:12.5px;color:#6f7c8b}
+  .foot{margin-top:26px;font-size:12.5px;color:var(--muted)}
 
   :root{color-scheme:dark}
   [hidden]{display:none!important}
@@ -61,19 +61,43 @@
   .wrap,.card{min-width:0}
   .stage{min-height:160px}
   .choice{margin:14px 0}
+  input[type=text],input[type=number],select{min-height:44px;font-size:16px}
+  summary{min-height:44px;padding:8px 0;cursor:pointer}
+  .back{display:inline-flex;align-items:center;min-height:44px}
+  .choice label{display:flex;align-items:center;gap:8px;min-height:44px}
+  .choice input{flex:none;width:20px;height:20px}
+  .field-error{margin:6px 0;color:var(--danger);font-size:14px}
+  .field-error:empty{display:none}
+  [aria-invalid=true]{border-color:var(--danger)!important}
+  .mark-selectors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .mark-selectors>div{min-width:0}
+  @media(max-width:760px){.mark-selectors{grid-template-columns:1fr;gap:0}}
+  @media(min-width:761px) and (max-height:500px){
+    .wrap{padding-top:12px}
+    .page-heading{display:flex;align-items:center;gap:24px}
+    .page-heading h1{font-size:24px;margin:0}
+    .sub{font-size:13px;line-height:1.4;max-width:none;margin:4px 0 12px}
+    .stage{min-height:0}
+  }
 </style>
 <link rel="icon" href="./favicon.ico">
 </head>
 <body>
 <main class="wrap">
-<a href="./index.html">← 返回下载页</a>
-<h1>牌桌区域标注器</h1>
+<div class="page-heading"><a class="back" href="./index.html">← 返回下载页</a>
+<h1>牌桌区域标注器</h1></div>
 <p class="sub">按座位分别框选，生成安卓 0.6.16 可导入的区域模板。图片只在本机浏览器处理，不上传。请用实际共享给应用的完整画面；导入后仍须试识别。</p>
 <div class="layout">
 <section class="card" aria-label="牌桌截图与标注">
-<label for="region">标注区域（左 / 右均按截图位置）</label>
-<select id="region"></select>
-<div class="stage" id="stage">
+<div class="mark-selectors"><div><label for="rule">玩法</label>
+<select id="rule">
+<option value="CLASSIC_54">三人经典 / 不洗牌 54 张</option>
+<option value="CLASSIC_CHAIN_54">三人连炸 54 张</option>
+<option value="TEAM_84">2v2 双副 84 张（去 345）</option>
+<option value="TEAM_108">108 张 2v2 基础计牌</option>
+</select></div><div><label for="region">标注区域（左 / 右均按截图位置）</label>
+<select id="region"></select></div></div>
+<div class="stage" id="stage" aria-busy="false">
 <div class="hint" id="hint"><button id="pick" type="button">选择牌桌截图</button><p>也可拖入图片。框牌点和各家余牌数字，避开顶部记牌器。</p></div>
 <canvas id="cv" hidden aria-label="牌桌标注画布；可拖动或点击两个对角，亦可用右侧坐标输入"></canvas>
 </div>
@@ -81,6 +105,7 @@
 <p id="dimensions" class="foot"></p>
 <div class="row" id="tools" hidden>
 <button id="undo" type="button" disabled>撤销标注</button>
+<button id="remove" type="button" disabled>清除当前区域</button>
 <button id="clear" type="button">清空标注（可撤销）</button>
 <button id="reload" type="button">换一张图</button>
 </div>
@@ -91,13 +116,7 @@
 <section class="card" aria-label="模板设置和导出">
 <label for="pname">模板名称（最多 64 字）</label>
 <input id="pname" type="text" maxlength="64" value="我的牌桌" autocomplete="off">
-<label for="rule">玩法</label>
-<select id="rule">
-<option value="CLASSIC_54">三人经典 / 不洗牌 54 张</option>
-<option value="CLASSIC_CHAIN_54">三人连炸 54 张</option>
-<option value="TEAM_84">2v2 双副 84 张（去 345）</option>
-<option value="TEAM_108">108 张 2v2 基础计牌</option>
-</select>
+
 <div id="team-fields" hidden>
 <label for="mate">我的队友（导入后仍需确认先手）</label>
 <select id="mate"><option value="OPPOSITE">对家</option><option value="LEFT">左侧玩家</option><option value="RIGHT">右侧玩家</option></select>
@@ -108,17 +127,18 @@
 </div>
 <details style="margin-top:12px"><summary>用坐标标注（百分比，0–100）</summary>
 <div class="coords">
-<label for="coord-left">左<input id="coord-left" type="number" min="0" max="100" step="any" inputmode="decimal"></label>
-<label for="coord-top">上<input id="coord-top" type="number" min="0" max="100" step="any" inputmode="decimal"></label>
-<label for="coord-right">右<input id="coord-right" type="number" min="0" max="100" step="any" inputmode="decimal"></label>
-<label for="coord-bottom">下<input id="coord-bottom" type="number" min="0" max="100" step="any" inputmode="decimal"></label>
-</div><button id="apply-coordinates" type="button">应用到所选区域</button>
+<label for="coord-left">左<input id="coord-left" type="number" aria-describedby="coordinate-error" min="0" max="100" step="any" inputmode="decimal"></label>
+<label for="coord-top">上<input id="coord-top" type="number" aria-describedby="coordinate-error" min="0" max="100" step="any" inputmode="decimal"></label>
+<label for="coord-right">右<input id="coord-right" type="number" aria-describedby="coordinate-error" min="0" max="100" step="any" inputmode="decimal"></label>
+<label for="coord-bottom">下<input id="coord-bottom" type="number" aria-describedby="coordinate-error" min="0" max="100" step="any" inputmode="decimal"></label>
+</div><p id="coordinate-error" class="field-error"></p><button id="apply-coordinates" type="button">应用到所选区域</button>
 </details>
 <div class="row">
 <button id="export" class="primary" type="button" disabled>生成模板</button>
 <button id="copy" type="button" disabled>复制模板</button>
 <button id="save" type="button" disabled>下载 .json</button>
 </div>
+<div id="export-status" class="status" aria-hidden="true"></div>
 <label for="out">模板 JSON（修改设置后会重新生成）</label>
 <textarea id="out" readonly spellcheck="false" placeholder="先框完必选区域；操作按钮和三张底牌为可选区域"></textarea>
 <ol>
@@ -130,7 +150,7 @@
 </section>
 </div>
 </main>
-<script src="./layout-model.js"></script>
-<script src="./layout-marker.js"></script>
+<script src="./layout-model.js?v=59792013ec4c"></script>
+<script src="./layout-marker.js?v=07cde3bc3f30"></script>
 </body>
 </html>

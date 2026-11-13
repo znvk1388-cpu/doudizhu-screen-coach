@@ -14,14 +14,30 @@
     return seats[parts[1]] + (parts[0] === 'play' ? '出牌区' : '余牌张数区');
   }
   function color(key) { return key === 'hand' ? '#4c8dff' : key.indexOf('count:') === 0 ? '#6ee7b7' : '#f0b429'; }
-  function setStatus(text, kind) { statusEl.textContent = text; statusEl.className = 'status ' + (kind || ''); }
+  function setStatus(text, kind) {
+    [statusEl, document.getElementById('export-status')].forEach(function (element) {
+      element.textContent = text; element.className = 'status ' + (kind || '');
+    });
+  }
+  function cancelGesture() {
+    var id = drag && drag.id, interrupted = !!drag || !!corner;
+    drag = null; corner = null;
+    if (id != null && cv.hasPointerCapture(id)) cv.releasePointerCapture(id);
+    return interrupted;
+  }
   function fields() {
+    document.getElementById('coordinate-error').textContent = '';
     var r = draft.rects[active];
     ['left','top','right','bottom'].forEach(function (key, i) {
+      document.getElementById('coord-' + key).removeAttribute('aria-invalid');
       document.getElementById('coord-' + key).value = r ? +([r.x,r.y,r.x+r.w,r.y+r.h][i]*100).toFixed(4) : '';
     });
   }
-  function choose(key) { active = key; regionSelect.value = key; corner = null; drag = null; fields(); draw(); }
+  function choose(key) {
+    cancelGesture(); active = key; regionSelect.value = key;
+    document.getElementById('remove').disabled = !draft.rects[active];
+    fields(); draw();
+  }
   function sync() {
     outEl.value = '';
     document.getElementById('rule').value = draft.rule;
@@ -40,6 +56,7 @@
     var missing = draft.missing(), ready = !!img && !missing.length;
     ['export','copy','save'].forEach(function (id) { document.getElementById(id).disabled = !ready; });
     document.getElementById('undo').disabled = !draft.history.length;
+    document.getElementById('remove').disabled = !draft.rects[active];
     var done = M.requiredRegions(draft.rule).length - missing.length;
     setStatus(img ? '必选区域 ' + done + '/' + M.requiredRegions(draft.rule).length +
       (missing.length ? '，下一步：' + label(missing[0]) : ' 已齐。下载后仍需在应用内试识别。') : '先选一张完整牌桌截图。', ready ? 'ok' : '');
@@ -47,13 +64,19 @@
   }
   function fitCanvas() {
     if (!img) return;
+    var interrupted = cancelGesture();
     var maxW = Math.max(1, stage.clientWidth - 4), maxH = Math.max(160, Math.min(window.innerHeight*.62,720));
+    if(window.innerWidth>760 && window.innerHeight<=500){
+      var stageTop=stage.getBoundingClientRect().top+window.scrollY;
+      maxH=Math.max(120,Math.min(maxH,window.innerHeight-stageTop-12));
+    }
     var scale = Math.min(maxW/img.naturalWidth, maxH/img.naturalHeight);
     cssW = Math.max(1, Math.floor(img.naturalWidth*scale)); cssH = Math.max(1, Math.floor(img.naturalHeight*scale));
     cv.style.width = cssW+'px'; cv.style.height = cssH+'px';
     var dpr=window.devicePixelRatio || 1;
     cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0); draw();
+    if (interrupted) setStatus('屏幕尺寸已变化，未完成的框已取消；已有标注保留。','warn');
   }
   function draw() {
     if (!img) return;
@@ -88,45 +111,71 @@
     } catch(e) {setStatus(e.message,'bad');}
   }
   cv.addEventListener('pointerdown',function(e){
-    if(!img || e.button !== 0)return;
+    if(!img || e.button !== 0 || e.isPrimary === false || drag)return;
     cv.setPointerCapture(e.pointerId);var p=pos(e);
-    drag={x0:p.x,y0:p.y,x1:p.x,y1:p.y};draw();
+    drag={id:e.pointerId,x0:p.x,y0:p.y,x1:p.x,y1:p.y};draw();
   });
-  cv.addEventListener('pointermove',function(e){if(drag){var p=pos(e);drag.x1=p.x;drag.y1=p.y;draw();}});
+  cv.addEventListener('pointermove',function(e){if(drag && e.pointerId===drag.id){var p=pos(e);drag.x1=p.x;drag.y1=p.y;draw();}});
   cv.addEventListener('pointerup',function(e){
-    if(!drag)return;var p=pos(e),d=drag;drag=null;
+    if(!drag || e.pointerId!==drag.id)return;var p=pos(e),d=drag;drag=null;
     if(Math.hypot(p.x-d.x0,p.y-d.y0)<4){
       if(!corner){corner={x:p.x/cssW,y:p.y/cssH};setStatus('已选第一个角，再点相对的角。');draw();return;}
       var c=corner;corner=null;commit(M.normalizeRect(c.x*cssW,c.y*cssH,p.x,p.y,cssW,cssH));
     }else{corner=null;commit(M.normalizeRect(d.x0,d.y0,p.x,p.y,cssW,cssH));}
   });
-  cv.addEventListener('pointercancel',function(){drag=null;corner=null;draw();});
+  function pointerInterrupted(e) {
+    if(drag && e.pointerId===drag.id){cancelGesture();draw();setStatus('触控已取消，请重新框选；已有标注保留。','warn');}
+  }
+  cv.addEventListener('pointercancel',pointerInterrupted);
+  cv.addEventListener('lostpointercapture',pointerInterrupted);
   regionSelect.addEventListener('change',function(){choose(regionSelect.value);});
   document.getElementById('apply-coordinates').addEventListener('click',function(){
     if(!img){setStatus('请先选图。','warn');return;}
     var inputs=['left','top','right','bottom'].map(function(k){return document.getElementById('coord-'+k);});
-    if(inputs.some(function(input){return input.value==='' || !input.checkValidity();})){setStatus('请填写 0–100 的四个坐标。','bad');return;}
+    inputs.forEach(function(input){input.removeAttribute('aria-invalid');});
+    var invalid=inputs.filter(function(input){return input.value==='' || !input.checkValidity();});
     var v=inputs.map(function(input){return Number(input.value)/100;});
-    if(v[2]<=v[0] || v[3]<=v[1]){setStatus('右、下坐标须分别大于左、上坐标。','bad');return;}
+    var message='请填写 0–100 的四个坐标。';
+    if(!invalid.length){
+      if(v[2]<=v[0]) invalid.push(inputs[2]);
+      if(v[3]<=v[1]) invalid.push(inputs[3]);
+      message='右、下坐标须分别大于左、上坐标。';
+    }
+    if(invalid.length){
+      invalid.forEach(function(input){input.setAttribute('aria-invalid','true');});
+      document.getElementById('coordinate-error').textContent=message;
+      invalid[0].focus();setStatus(message,'bad');return;
+    }
+    document.getElementById('coordinate-error').textContent='';
     commit({x:v[0],y:v[1],w:v[2]-v[0],h:v[3]-v[1]});
   });
-  document.getElementById('pname').addEventListener('input',function(){draft.name=this.value;sync();});
-  document.getElementById('rule').addEventListener('change',function(){draft.setRule(this.value);corner=null;sync();});
+  document.getElementById('pname').addEventListener('input',function(){
+    draft.name=this.value;outEl.value='';setStatus('名称已修改，请重新生成或下载。');
+  });
+  document.getElementById('rule').addEventListener('change',function(){cancelGesture();draft.setRule(this.value);sync();});
   document.getElementById('mate').addEventListener('change',function(){draft.mate=this.value;sync();});
   document.getElementById('chain-high').addEventListener('change',function(){draft.chainSameLengthHighWins=this.checked;sync();});
-  document.getElementById('undo').addEventListener('click',function(){draft.undo();corner=null;drag=null;sync();});
-  document.getElementById('clear').addEventListener('click',function(){draft.clear();corner=null;drag=null;sync();});
+  document.getElementById('undo').addEventListener('click',function(){cancelGesture();draft.undo();sync();});
+  document.getElementById('clear').addEventListener('click',function(){cancelGesture();draft.clear();sync();});
+  document.getElementById('remove').addEventListener('click',function(){
+    cancelGesture();
+    if(draft.removeRegion(active)){sync();setStatus('已清除'+label(active)+'，可撤销。');}
+  });
   ['pick','reload'].forEach(function(id){document.getElementById(id).addEventListener('click',function(){document.getElementById('file').click();});});
   document.getElementById('file').addEventListener('change',function(e){var file=e.target.files[0];e.target.value='';if(file)loadFile(file);});
   ['dragenter','dragover'].forEach(function(event){stage.addEventListener(event,function(e){e.preventDefault();stage.classList.add('drag');});});
   ['dragleave','drop'].forEach(function(event){stage.addEventListener(event,function(e){e.preventDefault();stage.classList.remove('drag');});});
   stage.addEventListener('drop',function(e){if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
   function loadFile(file){
-    if(!/^image\//.test(file.type)){setStatus('请选择图片文件。','bad');return;}
+    if(!/^image\//.test(file.type) && !(file.type==='' && /\.(png|jpe?g|webp|gif|bmp|svg|avif)$/i.test(file.name))){
+      setStatus('请选择 PNG、JPG 等图片文件。','bad');return;
+    }
     if(Object.keys(draft.rects).length && !window.confirm('更换截图会清空当前标注。需要保留时请先取消并下载模板。继续更换？'))return;
+    stage.setAttribute('aria-busy','true');setStatus('正在读取图片，当前标注暂时保留。');
     var token=++request,url=URL.createObjectURL(file),im=new Image();
     im.onload=function(){
       URL.revokeObjectURL(url);if(token!==request)return;
+      stage.setAttribute('aria-busy','false');cancelGesture();
       img=im;draft=new M.Draft(im.naturalWidth,im.naturalHeight);
       draft.name=document.getElementById('pname').value;
       draft.setRule(document.getElementById('rule').value);draft.history=[];
@@ -138,7 +187,10 @@
         (im.naturalWidth<im.naturalHeight?'（竖屏：客户端校准主要按横屏设计，尚未实机验证）':'（横屏）');
       fitCanvas();sync();
     };
-    im.onerror=function(){URL.revokeObjectURL(url);if(token===request)setStatus('图片读取失败，原标注已保留。','bad');};
+    im.onerror=function(){
+      URL.revokeObjectURL(url);
+      if(token===request){stage.setAttribute('aria-busy','false');setStatus('图片读取失败，请换成 PNG/JPG 重试；原标注已保留。','bad');}
+    };
     im.src=url;
   }
   function generate(){
@@ -148,10 +200,15 @@
   document.getElementById('export').addEventListener('click',function(){if(generate())setStatus('已生成。到“更多识牌设置 → 备份／导入区域模板”导入，再试识别。','ok');});
   document.getElementById('copy').addEventListener('click',async function(){
     var value=generate();if(!value)return;
+    function stillCurrent(){
+      if(outEl.value!==value){setStatus('模板已修改，请重新复制。','warn');return false;}
+      return true;
+    }
     try{
       if(!navigator.clipboard || !navigator.clipboard.writeText)throw Error('unavailable');
-      await navigator.clipboard.writeText(value);setStatus('已复制模板。','ok');
+      await navigator.clipboard.writeText(value);if(stillCurrent())setStatus('已复制模板。','ok');
     }catch(e){
+      if(!stillCurrent())return;
       outEl.focus();outEl.select();
       var copied=false;try{copied=document.execCommand('copy');}catch(ignore){}
       setStatus(copied?'已复制模板。':'复制失败，已选中文本；请手动复制或下载文件。',copied?'ok':'warn');
@@ -168,7 +225,7 @@
     if(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
     var key=Number(e.key),regions=M.requiredRegions(draft.rule);
     if(key>=1 && key<=regions.length)choose(regions[key-1]);
-    if(e.key==='Escape'){drag=null;corner=null;draw();}
+    if(e.key==='Escape'){cancelGesture();draw();}
     if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){e.preventDefault();document.getElementById('undo').click();}
   });
   window.addEventListener('resize',fitCanvas);sync();
