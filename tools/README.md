@@ -2,7 +2,7 @@
 
 下载 [校验工具 ZIP](https://znvk1388-cpu.github.io/doudizhu-screen-coach/downloads/apk-check-tools.zip)，完整解压，三个文件 verify-apk.bat、verify-apk.ps1、releases.json 保持在同一目录。把 APK 拖到 verify-apk.bat 上。
 
-默认不需要 Android SDK 或管理员权限。脚本会计算 SHA-256，并与附带清单中的两个 0.6.16 安装包比对，改过文件名也可以识别。未知文件显示 UNVERIFIED，绝不会按通过处理。
+默认不需要 Android SDK 或管理员权限。脚本会计算 SHA-256，并与附带清单中的两个 0.6.17 安装包比对，改过文件名也可以识别。未知文件显示 UNVERIFIED，绝不会按通过处理。
 
 ## 两种检查的区别
 
@@ -22,7 +22,7 @@ verify-apk.bat "D:\Downloads\renamed.apk"
 单独给期望哈希（只进行文件一致性检查）：
 
 ~~~powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-apk.ps1 -Path "D:\Downloads\app.apk" -ExpectedSha256 d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98
+powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-apk.ps1 -Path "D:\Downloads\app.apk" -ExpectedSha256 b795c42e645d088506cf0a1149b41532c690cbf7fddce5526dc6e3ca9d5d0516
 ~~~
 
 完整签名检查：安装 Android SDK Build Tools，设置好 Java，并将 apksigner 加到 PATH，或显式指定路径：
@@ -39,8 +39,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\verify-apk.ps1 -Path "D:\D
 
 | 文件 | SHA-256 |
 | --- | --- |
-| 轻量版 doudizhu-coach-0.6.16-android-lite-arm64.apk | d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98 |
-| 完整版 doudizhu-coach-0.6.16-android-arm64.apk | 31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724 |
+| 轻量版 doudizhu-coach-0.6.17-android-lite-arm64.apk | b795c42e645d088506cf0a1149b41532c690cbf7fddce5526dc6e3ca9d5d0516 |
+| 完整版 doudizhu-coach-0.6.17-android-arm64.apk | 22734ecbd9bd819b4a9ecf9baafa555b1de6c390f10457f79c864b5aa9478d0b |
 
 两版证书 SHA-256：3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC。
 

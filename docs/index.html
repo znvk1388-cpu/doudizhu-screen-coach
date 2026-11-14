@@ -121,36 +121,38 @@
   .status{min-height:24px;color:var(--accent-2)}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 @media(max-width:600px){header{padding:36px 0 12px}h2{margin-top:32px}}
+  .callout.tablet-note{border-left-color:var(--accent);background:rgba(76,141,255,.08)}
 </style>
 <link rel="icon" href="./favicon.ico">
 </head>
 <body>
 <main class="wrap">
 <header>
-<span class="badge"><span class="dot"></span>安卓 0.6.16 · Windows 0.6.13</span>
+<span class="badge"><span class="dot"></span>安卓 0.6.17 · Windows 0.6.13</span>
 <h1>斗地主屏幕记牌</h1>
 <p class="sub">手机游戏识屏、现实听朋友报牌、电脑独立使用。按你的场景下载，先试识别，再从完整新局开始记牌。</p>
 <nav class="nav" aria-label="页面导航"><a href="#android">安卓下载</a><a href="#windows">Windows 下载</a><a href="./layout-marker.html">区域标注</a><a href="./privacy.html">隐私说明</a></nav>
 </header>
 <section id="android" aria-labelledby="android-title">
 <h2 id="android-title">安卓：按使用场景选择</h2>
-<p>Android 8.0 及以上、64 位 ARM（arm64-v8a）。当前包不支持 32 位和 x86；尚未完成目标手机整局验收。</p>
+<p>Android 8.0 及以上、64 位 ARM（arm64-v8a）。当前包不支持 32 位和 x86；手机与平板共用安装包；尚未完成目标设备整局验收。</p>
 <div class="grid">
 <article class="card reco">
 <h3>玩手机游戏 <span class="tag reco">轻量版</span></h3>
 <p>识别你授权共享的小程序或软件牌桌，浮窗记牌并用系统中文播报。<b>不能听朋友报牌，不申请麦克风。</b></p>
-<div class="meta"><span>0.6.16 · <b>13.9 MB</b></span><span>Android 8+ · arm64</span></div>
-<a class="btn btn-primary" href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.16/doudizhu-coach-0.6.16-android-lite-arm64.apk">下载安卓轻量版</a>
-<details><summary>文件 SHA-256</summary><div class="hashrow"><span class="hash" id="h-lite">d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98</span><button class="copy" type="button" data-copy="h-lite" aria-label="复制轻量版 SHA-256">复制</button></div></details>
+<div class="meta"><span>0.6.17 · <b>13.9 MB</b></span><span>Android 8+ · arm64</span></div>
+<a class="btn btn-primary" href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.17/doudizhu-coach-0.6.17-android-lite-arm64.apk">下载安卓轻量版</a>
+<details><summary>文件 SHA-256</summary><div class="hashrow"><span class="hash" id="h-lite">b795c42e645d088506cf0a1149b41532c690cbf7fddce5526dc6e3ca9d5d0516</span><button class="copy" type="button" data-copy="h-lite" aria-label="复制轻量版 SHA-256">复制</button></div></details>
 </article>
 <article class="card">
 <h3>现实和朋友玩 <span class="tag alt">完整版</span></h3>
 <p>保留全部识屏能力，额外用离线模型听朋友报牌、辅助区分说话人。<b>多人抢话、方言、噪声和错认仍需手动核对。</b></p>
-<div class="meta"><span>0.6.16 · <b>75.3 MB</b></span><span>听牌时需要麦克风</span></div>
-<a class="btn btn-ghost" href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.16/doudizhu-coach-0.6.16-android-arm64.apk">下载安卓完整版</a>
-<details><summary>文件 SHA-256</summary><div class="hashrow"><span class="hash" id="h-full">31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724</span><button class="copy" type="button" data-copy="h-full" aria-label="复制完整版 SHA-256">复制</button></div></details>
+<div class="meta"><span>0.6.17 · <b>75.4 MB</b></span><span>听牌时需要麦克风</span></div>
+<a class="btn btn-ghost" href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.17/doudizhu-coach-0.6.17-android-arm64.apk">下载安卓完整版</a>
+<details><summary>文件 SHA-256</summary><div class="hashrow"><span class="hash" id="h-full">22734ecbd9bd819b4a9ecf9baafa555b1de6c390f10457f79c864b5aa9478d0b</span><button class="copy" type="button" data-copy="h-full" aria-label="复制完整版 SHA-256">复制</button></div></details>
 </article>
 </div>
+<div class="callout tablet-note"><b>小米平板 7 / 澎湃 OS 3：</b>0.6.17 新增宽窗口双栏、分屏小窗单栏和校准布局适配。手机和平板共用一个包；按实际游戏画面重新校准。<b>本轮为模拟验收，目标平板的整局识别、权限与后台仍待实机核对。</b></div>
 <p class="muted">两版同包名、同签名、同版本号，可以互相覆盖。切换版本无需卸载；切为轻量版不会自动删除先前保存的声纹。语音播报两版都有，听现场声音只有完整版。</p>
 </section>
 <section id="windows" aria-labelledby="windows-title">
@@ -188,20 +190,20 @@
 <details id="verify"><summary>高级：核对文件与安卓签名</summary>
 <p>当前 APK 证书名称为 CN=Android Debug，属于调试签名；仅凭这个名称不能断定该具体私钥公开。正式签名迁移方案尚未发布。下载后可核对本页 SHA-256。</p>
 <p><a class="btn btn-ghost" href="./downloads/apk-check-tools.zip">下载 Windows APK 校验工具 ZIP</a></p>
-<p>完整解压工具，把 APK 拖到 verify-apk.bat。默认与附带的 0.6.16 清单核对；改文件名也可识别。未知文件显示“未核验”。FILE_HASH_MATCH 只表示字节一致；签名检查另看 APK_SIGNATURE_VERIFIED。</p>
+<p>完整解压工具，把 APK 拖到 verify-apk.bat。默认与附带的 0.6.17 清单核对；改文件名也可识别。未知文件显示“未核验”。FILE_HASH_MATCH 只表示字节一致；签名检查另看 APK_SIGNATURE_VERIFIED。</p>
 <p>需要完整签名验证时使用 <a href="https://developer.android.com/tools/apksigner">Android 官方 apksigner</a>。明确指定证书却缺少工具时，脚本会以非零状态结束，不会静默跳过。</p>
-<dl class="kv"><dt>安卓包名</dt><dd>com.mengw.doudizhu.voice</dd><dt>安卓版本</dt><dd>0.6.16 · versionCode 22</dd><dt>证书 SHA-256</dt><dd class="hash">3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC</dd></dl>
-<p><a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/tree/main/tools">脚本源码、参数与退出码</a> · <a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/tag/v0.6.16">安卓全部附件与验收报告</a></p>
+<dl class="kv"><dt>安卓包名</dt><dd>com.mengw.doudizhu.voice</dd><dt>安卓版本</dt><dd>0.6.17 · versionCode 23</dd><dt>证书 SHA-256</dt><dd class="hash">3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC</dd></dl>
+<p><a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/tree/main/tools">脚本源码、参数与退出码</a> · <a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/tag/v0.6.17">安卓全部附件与验收报告</a></p>
 </details>
 <section id="voice" aria-labelledby="voice-title">
 <h2 id="voice-title">听牌前先了解声纹</h2>
 <p>完整版可以为座位注册声音特征。开始前请先告知朋友并取得同意；特征用于本机区分说话人，不能当作可靠的身份认证。</p>
-<p>当前 0.6.16 <b>没有</b>独立声纹同意页、逐人删除或 30 天自动到期清理。向量保存在应用私有数据中；重新注册会替换对应座位。要清除全部本地数据，可在系统应用设置清除存储，但会同时删除牌局、模板与设置，请先备份模板。</p>
-<p>屏幕识牌无需麦克风，系统中文播报与听现场声音是两项功能。详见<a href="./privacy.html">隐私与本地数据说明 v1.1</a>。</p>
+<p>当前 0.6.17 <b>没有</b>独立声纹同意页、逐人删除或 30 天自动到期清理。向量保存在应用私有数据中；重新注册会替换对应座位。要清除全部本地数据，可在系统应用设置清除存储，但会同时删除牌局、模板与设置，请先备份模板。</p>
+<p>屏幕识牌无需麦克风，系统中文播报与听现场声音是两项功能。详见<a href="./privacy.html">隐私与本地数据说明 v1.2</a>。</p>
 </section>
 <section id="migrate" aria-labelledby="migrate-title">
 <h2 id="migrate-title">换手机、备份与未来迁移</h2>
-<div class="callout"><b>先备份并验证，最后再考虑卸载旧应用。</b> 当前 0.6.16 更新和轻量/完整版切换使用原签名覆盖安装，无需先卸载。未来若更换签名或包名，将另行公布具体步骤。</div>
+<div class="callout"><b>先备份并验证，最后再考虑卸载旧应用。</b> 当前 0.6.17 更新和轻量/完整版切换使用原签名覆盖安装，无需先卸载。未来若更换签名或包名，将另行公布具体步骤。</div>
 <ol class="steps">
 <li><h4>导出模板</h4><p>主界面 → 更多识牌设置 → 备份／导入区域模板 → 导出所选模板，确认文件已保存。</p></li>
 <li><h4>另存需要保留的记录</h4><p>模板只含区域和玩法，不含牌局、录音或声纹。重要牌局可先截图；当前没有完整数据备份与恢复，声音需在新设备重新注册。</p></li>
@@ -211,12 +213,13 @@
 </section>
 <section aria-labelledby="changes-title">
 <h2 id="changes-title">近期网站更新</h2>
+<p><b>2026-11-14 发布：</b>安卓0.6.17已加入手机/平板窗口适配和校准触控保护；实际游戏与澎湃OS3后台仍待目标平板核对。</p>
 <p><b>2026-11-13：</b>玩法选择移到标注前，支持清除单个区域并撤销；补坐标错误定位与操作旁反馈，增大手机控件；修复旋转屏幕、多指误触和复制过程中修改模板的提示。</p>
-<p>统一安卓模板格式，补按座位标注、可撤销清空与最新状态导出；校验工具区分未核验和通过；修正隐私、签名和迁移说明；补 Windows 下载入口。本次未替换客户端安装包。</p>
+<p><b>2026-11-12 网页：</b>统一安卓模板格式，补按座位标注、可撤销清空与最新状态导出；校验工具区分未核验和通过；修正隐私、签名和迁移说明；补 Windows 下载入口。该次网页修复未替换客户端安装包。</p>
 </section>
 <footer>
 <p>公开仓库保存网站、安装包和说明，完整客户端开发源码仍在本机。第三方许可随安装包保留。</p>
-<p><a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach">GitHub 仓库与发布记录</a> · <a href="./privacy.html">隐私说明 v1.1（2026-11-12）</a> · <a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/issues">问题反馈</a></p>
+<p><a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach">GitHub 仓库与发布记录</a> · <a href="./privacy.html">隐私说明 v1.2（2026-11-14）</a> · <a href="https://github.com/znvk1388-cpu/doudizhu-screen-coach/issues">问题反馈</a></p>
 <p>技术可识别不代表平台许可。请遵守所玩平台规则；识别结果仍需核对。</p>
 </footer>
 </main>

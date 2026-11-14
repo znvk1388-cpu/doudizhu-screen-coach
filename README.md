@@ -4,15 +4,15 @@ Windows和安卓各自独立运行的斗地主记牌工具。本仓库保存安�
 
 ## 当前下载
 
-安卓最新版0.6.16，Windows当前版0.6.13。安卓附件已于2026-11-11上传，6个附件的远端大小与SHA-256均已核对。
+安卓最新版0.6.17，Windows当前版0.6.13。安卓附件已于2026-11-13上传，5个附件的远端大小与SHA-256均已核对。
 
 | 平台 | 安装包 | 使用方式 |
 | --- | --- | --- |
-| 安卓 | [完整版APK](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.16/doudizhu-coach-0.6.16-android-arm64.apk) | 64位ARM安卓8及以上，原签名覆盖安装 |
-| 安卓可选 | [轻量版APK](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.16/doudizhu-coach-0.6.16-android-lite-arm64.apk) | 无听牌模型，保留屏幕识牌、系统播报和手动功能；两版相互覆盖 |
+| 安卓 | [完整版APK](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.17/doudizhu-coach-0.6.17-android-arm64.apk) | 64位ARM安卓8及以上，原签名覆盖安装 |
+| 安卓可选 | [轻量版APK](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.17/doudizhu-coach-0.6.17-android-lite-arm64.apk) | 无听牌模型，保留屏幕识牌、系统播报和手动功能；两版相互覆盖 |
 | Windows x64 | [免安装ZIP](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.13/doudizhu-coach-0.6.13-windows-x64.zip) | 完整解压后运行 `DouDizhuCoach.exe` |
 
-[0.6.16全部附件、说明与校验](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/tag/v0.6.16) · [0.6.15上一版](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/tag/v0.6.15)
+[0.6.17全部附件、说明与校验](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/tag/v0.6.17) · [0.6.16上一版](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/tag/v0.6.16)
 
 在线阅读版：[下载页](https://znvk1388-cpu.github.io/doudizhu-screen-coach/) · [隐私政策](https://znvk1388-cpu.github.io/doudizhu-screen-coach/privacy.html)
 
@@ -22,10 +22,16 @@ Windows和安卓各自独立运行的斗地主记牌工具。本仓库保存安�
 
 | 文件 | 体积（字节） | SHA-256 |
 | --- | --- | --- |
-| 轻量版<br>`doudizhu-coach-0.6.16-android-lite-arm64.apk` | 14,583,904 | `d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98` |
-| 完整版<br>`doudizhu-coach-0.6.16-android-arm64.apk` | 79,006,455 | `31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724` |
+| 轻量版<br>`doudizhu-coach-0.6.17-android-lite-arm64.apk` | 14,586,588 | `b795c42e645d088506cf0a1149b41532c690cbf7fddce5526dc6e3ca9d5d0516` |
+| 完整版<br>`doudizhu-coach-0.6.17-android-arm64.apk` | 79,010,755 | `22734ecbd9bd819b4a9ecf9baafa555b1de6c390f10457f79c864b5aa9478d0b` |
 
 **关于签名**：当前两个 APK 的证书显示 CN=Android Debug，属于调试签名。证书名称本身不能证明特定私钥公开，本仓库未确认该具体私钥的公开来源。先核对文件 SHA-256；需要签名有效性检查时使用 Android 官方 apksigner。正式签名迁移方案尚未发布；当前同签名覆盖安装无需卸载。换手机先导出模板，在新设备导入并试识别后，再决定是否处理旧应用数据。模板不含牌局和声纹。
+
+## 0.6.17 平板适配与验收
+
+小米平板7与澎湃OS3使用同一原签名安卓包。按当前窗口自动双栏/单栏、校准栏自适应、触摸中断不误改区域，并补平板设置说明。完整版406项、轻量版413项回归通过，静态检查较0.6.16少1项提示、无新增，签名/权限/模型/许可/16KB检查通过。
+
+未连接目标平板：HyperOS3权限、实际整局识别、后台与耗电仍待实机验收；不宣称所有游戏已适配。请按实际共享画面重新校准，勿直接套用手机16:9区域。见[本轮验收报告](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.17/release-report-zh.md)。
 
 ## 2026-11-12 网站修复
 
@@ -45,7 +51,7 @@ Windows和安卓各自独立运行的斗地主记牌工具。本仓库保存安�
 
 文件仅包含区域与玩法，不含截图、录音、声纹或牌局记录。本轮模板文件用于安卓客户端复用，无新增存储权限。建议开局前操作；不同手机、皮肤和游戏版本仍需重新核对。
 
-## 本轮对标与验收
+## 0.6.16 对标与验收
 
 复核天天、精灵、简单、至尊及Han的一手功能资料，详见[市场对标报告](https://github.com/znvk1388-cpu/doudizhu-screen-coach/releases/download/v0.6.16/market-comparison-zh.md)。Han命名布局是复用参照，跨手机模板文件属于本项目的工程延伸。未安装竞品或进行同机性能排名。
 

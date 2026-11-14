@@ -2,13 +2,13 @@
   "version": 1,
   "files": [
     {
-      "name": "doudizhu-coach-0.6.16-android-lite-arm64.apk",
-      "sha256": "d7ee3352cc54b553922f7ae083474dada7c6541f30c17c5d6acf36ca94f18e98",
+      "name": "doudizhu-coach-0.6.17-android-lite-arm64.apk",
+      "sha256": "b795c42e645d088506cf0a1149b41532c690cbf7fddce5526dc6e3ca9d5d0516",
       "certificateSha256": "3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC"
     },
     {
-      "name": "doudizhu-coach-0.6.16-android-arm64.apk",
-      "sha256": "31997a634097efbe7fd2d4d545e2ebc9c7edabd4066e5b8047459700666cd724",
+      "name": "doudizhu-coach-0.6.17-android-arm64.apk",
+      "sha256": "22734ecbd9bd819b4a9ecf9baafa555b1de6c390f10457f79c864b5aa9478d0b",
       "certificateSha256": "3E635A55A7582B3DD83424FD4078C4FECB39AE1CA41C1B7C2AC217D3A51172BC"
     }
   ]
